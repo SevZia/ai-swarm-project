@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "archetype_source": "https://raw.githubusercontent.com/vanduc86vn-tech/universal-ai-swarm-framework/main/UNIVERSAL_AI_SWARM_ARCHETYPE.json",
+  "project_instance": "PENDING_DISCOVERY",
+  "description": "Bản đăng bạ phân vai bất biến cho dự án, kế thừa từ Universal AI Swarm Framework V2.4.",
+  "inheritance_status": "COMPILED_AND_LOCKED_IMMUTABLE",
+  "last_audited": "2026-10-27T10:28:00+07:00",
+  "audited_by": "Alex & AI-LEAD",
+  "slot_bindings": [
+    {
+      "slot": "CONVERSATION_ID_1",
+      "abstract_meta_role": "SYSTEM_ARCHITECT_AND_TECHNICAL_LEAD",
+      "concrete_conversation_id": "4587490e-2f01-46f3-acdf-ab63d408bd1d",
+      "project_assigned_id": "AI-LEAD&BA",
+      "project_specific_title": "Chief Product Architect & Swarm Orchestrator (AI-LEAD&BA)",
+      "project_specific_context": "Lắng nghe bóc tách nghiệp vụ (BA), điều phối kỹ nghệ, quản trị SDLC, phân bổ Task Sprint và ban hành tiêu chuẩn kiến trúc.",
+      "exclusive_boundaries": [
+        "README.md",
+        "swarm/AI_SWARM_REGISTRY.json",
+        "swarm/TASK_DISPATCH_BOARD.json"
+      ],
+      "status": "ACTIVE_IMMUTABLE"
+    },
+    {
+      "slot": "CONVERSATION_ID_2",
+      "abstract_meta_role": "DATA_TIER_AND_STORAGE_ENGINE_ARCHITECT",
+      "concrete_conversation_id": null,
+      "project_assigned_id": "AI-DATA",
+      "project_specific_title": "Database & Data Model Architect",
+      "project_specific_context": "Thiết kế CSDL quan hệ 3NF/NoSQL, DDL, Migrations, Security Views, Stored Procedures.",
+      "exclusive_boundaries": [
+        "migrations/",
+        "schema/",
+        "DDL_*.sql"
+      ],
+      "status": "PENDING_JUST_IN_TIME_BINDING"
+    },
+    {
+      "slot": "CONVERSATION_ID_3",
+      "abstract_meta_role": "QUALITY_ASSURANCE_SECURITY_AND_INFRA_AUDITOR",
+      "concrete_conversation_id": null,
+      "project_assigned_id": "AI-AUDIT",
+      "project_specific_title": "Quality Gate, Security & Infra Auditor",
+      "project_specific_context": "Kiểm toán 5 Quality Gates, Zero-Trust, bảo mật API, hiệu năng CSDL, cấp chứng chỉ nghiệm thu.",
+      "exclusive_boundaries": [
+        "QA_AUDIT_*.md",
+        "tests/"
+      ],
+      "status": "PENDING_JUST_IN_TIME_BINDING"
+    },
+    {
+      "slot": "CONVERSATION_ID_4",
+      "abstract_meta_role": "BACKEND_SERVICES_AND_API_GATEWAY_ARCHITECT",
+      "concrete_conversation_id": null,
+      "project_assigned_id": "AI-BACKEND",
+      "project_specific_title": "Backend Services & API Architect",
+      "project_specific_context": "Xây dựng RESTful API / GraphQL, xác thực JWT/SSO, background workers, event queues.",
+      "exclusive_boundaries": [
+        "src/backend/",
+        "src/api/",
+        "src/workers/"
+      ],
+      "status": "PENDING_JUST_IN_TIME_BINDING"
+    },
+    {
+      "slot": "CONVERSATION_ID_5",
+      "abstract_meta_role": "CLIENT_FACING_FRONTEND_SPECIALIST",
+      "concrete_conversation_id": null,
+      "project_assigned_id": "AI-CLIENT-UI",
+      "project_specific_title": "Public Client Frontend / Customer Portal Specialist",
+      "project_specific_context": "Giao diện khách hàng cuối (Web SPA / Mobile App), UX, Client State, i18n đa ngôn ngữ.",
+      "exclusive_boundaries": [
+        "src/frontend/portal/",
+        "src/client/"
+      ],
+      "status": "PENDING_JUST_IN_TIME_BINDING"
+    },
+    {
+      "slot": "CONVERSATION_ID_6",
+      "abstract_meta_role": "INTERNAL_ADMIN_AND_OPERATIONS_UI_SPECIALIST",
+      "concrete_conversation_id": null,
+      "project_assigned_id": "AI-ADMIN-UI",
+      "project_specific_title": "Internal Backoffice & Admin Management UI Specialist",
+      "project_specific_context": "Giao diện quản trị nội bộ doanh nghiệp, Dashboard BI, quy trình phê duyệt nhiều bước.",
+      "exclusive_boundaries": [
+        "src/frontend/backoffice/",
+        "src/admin/"
+      ],
+      "status": "PENDING_JUST_IN_TIME_BINDING"
+    },
+    {
+      "slot": "CONVERSATION_ID_7",
+      "abstract_meta_role": "DOMAIN_BUSINESS_LOGIC_SPECIALIST",
+      "concrete_conversation_id": null,
+      "project_assigned_id": "AI-DOMAIN",
+      "project_specific_title": "Domain Business Logic Specialist",
+      "project_specific_context": "Mô hình hóa nghiệp vụ chuyên sâu ngành (Domain-Driven Design), thuật toán cốt lõi, công thức tài chính.",
+      "exclusive_boundaries": [
+        "docs/domain/",
+        "src/domain/"
+      ],
+      "status": "PENDING_JUST_IN_TIME_BINDING"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "project_name": "PENDING_DISCOVERY",
+  "active_sprint": "SPRINT_0_DISCOVERY_AND_SETUP",
+  "last_updated": "2026-10-27T10:28:00+07:00",
+  "tasks": [
+    {
+      "task_id": "TASK-INIT-001",
+      "module": "SWARM_FOUNDATION",
+      "title": "Khởi tạo Swarm Workspace, Lock Registry AI-LEAD và phỏng vấn xác lập ngữ cảnh dự án",
+      "assigned_to": "AI-LEAD",
+      "status": "IN_PROGRESS",
+      "handoff_to": "PENDING_DISCOVERY",
+      "next_action": "Thu nhận phản hồi từ Project Owner (Alex) cho 3 câu hỏi phỏng vấn."
+    }
+  ]
+}

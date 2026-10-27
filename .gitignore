@@ -1,0 +1,18 @@
+# Swarm Scratch & Temporary storage
+scratch/
+backups/
+*.tmp
+*.dump
+*.log
+
+# Dependencies
+node_modules/
+dist/
+build/
+.cache/
+
+# OS and Environment
+.DS_Store
+Thumbs.db
+.env
+.env.local
