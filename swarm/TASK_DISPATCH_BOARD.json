@@ -1,17 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "project_name": "ai-swarm-project",
-  "active_sprint": "SPRINT_0_DISCOVERY_AND_SETUP",
-  "last_updated": "2026-10-27T11:42:00+07:00",
+  "active_sprint": "SPRINT_1_DATA_ENGINEERING_AND_STORAGE",
+  "last_updated": "2026-10-27T11:53:00+07:00",
   "tasks": [
     {
-      "task_id": "TASK-INIT-001",
-      "module": "SWARM_FOUNDATION",
-      "title": "Khởi tạo Swarm Workspace, Lock Registry AI-LEAD&BA và phỏng vấn xác lập ngữ cảnh dự án",
-      "assigned_to": "AI-LEAD&BA",
-      "status": "COMPLETED",
-      "handoff_to": "AI-LEAD&BA",
-      "next_action": "Thu nhận phản hồi từ Project Owner (SevZia) về mô tả nghiệp vụ và đặc tả tính năng."
+      "task_id": "TASK-DATA-001",
+      "module": "DATABASE_MIGRATIONS",
+      "title": "Thiết kế và biên soạn bộ migration DDL MySQL chuẩn cho hệ thống HDD Food",
+      "assigned_to": "AI-DATA",
+      "assigned_conversation_id": "f1c79e12-370f-4378-a5da-f18731d4b014",
+      "status": "ASSIGNED",
+      "description": "Đọc đặc tả tại docs/PROJECT_MASTER_SPECIFICATION.md. Tạo file migrations/001_hdd_food_schema.sql bao gồm DDL bảng Products, PriceHistory, InboundReceiptOCR, và View ExpiringProductsWarning. Đảm bảo cấu trúc tương thích 100% với AppSheet và MySQL 8.",
+      "handoff_to": "AI-AUDIT",
+      "next_action": "AI-DATA thực thi tạo script migrations/001_hdd_food_schema.sql, kiểm thử cú pháp SQL, commit và cập nhật TASK_DISPATCH_BOARD.json sang READY_FOR_AUDIT."
     }
   ]
 }

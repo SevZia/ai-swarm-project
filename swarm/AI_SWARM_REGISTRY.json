@@ -25,16 +25,16 @@
     {
       "slot": "CONVERSATION_ID_2",
       "abstract_meta_role": "DATA_TIER_AND_STORAGE_ENGINE_ARCHITECT",
-      "concrete_conversation_id": null,
+      "concrete_conversation_id": "f1c79e12-370f-4378-a5da-f18731d4b014",
       "project_assigned_id": "AI-DATA",
       "project_specific_title": "Database & Data Model Architect",
-      "project_specific_context": "Thiết kế CSDL quan hệ 3NF/NoSQL, DDL, Migrations, Security Views, Stored Procedures.",
+      "project_specific_context": "Thiết kế CSDL quan hệ MySQL hdd_appsheet, DDL, Migrations, Views cảnh báo cận date cho HDD Food.",
       "exclusive_boundaries": [
         "migrations/",
         "schema/",
         "DDL_*.sql"
       ],
-      "status": "PENDING_JUST_IN_TIME_BINDING"
+      "status": "ACTIVE_IMMUTABLE"
     },
     {
       "slot": "CONVERSATION_ID_3",
