@@ -60,11 +60,25 @@ function checkNewTasks() {
       // Bỏ qua nếu chưa cấu hình remote hoặc đang offline
     }
 
-    // 2. Đọc Task Dispatch Board
+    // 2. Tự động cập nhật vai trò từ Registry nếu chưa có
+    if (idArg && !roleArg && fs.existsSync(registryPath)) {
+      try {
+        const reg = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+        const entry = (reg.slot_bindings || reg.active_swarms || []).find(s => 
+          s.concrete_conversation_id === idArg || s.conversation_id === idArg
+        );
+        if (entry) {
+          roleArg = entry.project_assigned_id || entry.immutable_role_id || entry.abstract_meta_role;
+          console.log(`\n[REGISTRY LOOKUP]: Đã liên kết Conversation ID [${idArg}] -> Vai trò: [${roleArg}]`);
+        }
+      } catch {}
+    }
+
+    // 3. Đọc Task Dispatch Board
     if (!fs.existsSync(boardPath)) return;
     const board = JSON.parse(fs.readFileSync(boardPath, 'utf8'));
 
-    // 3. Tìm các task được giao cho vai trò này hoặc UUID này
+    // 4. Tìm các task được giao cho vai trò này hoặc UUID này
     const pendingTasks = (board.tasks || []).filter(t => {
       const matchRole = roleArg && t.assigned_to === roleArg;
       const matchId = idArg && (t.assigned_conversation_id === idArg || t.assigned_to === idArg);
