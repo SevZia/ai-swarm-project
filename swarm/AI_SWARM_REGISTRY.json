@@ -1,11 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "archetype_source": "https://raw.githubusercontent.com/vanduc86vn-tech/universal-ai-swarm-framework/main/UNIVERSAL_AI_SWARM_ARCHETYPE.json",
-  "project_instance": "PENDING_DISCOVERY",
-  "description": "Bản đăng bạ phân vai bất biến cho dự án, kế thừa từ Universal AI Swarm Framework V2.4.",
+  "project_instance": "ai-swarm-project",
+  "repository_url": "https://github.com/SevZia/ai-swarm-project.git",
+  "description": "Bản đăng bạ phân vai bất biến cho dự án ai-swarm-project, kế thừa từ Universal AI Swarm Framework V3.2.",
   "inheritance_status": "COMPILED_AND_LOCKED_IMMUTABLE",
-  "last_audited": "2026-10-27T10:28:00+07:00",
-  "audited_by": "Alex & AI-LEAD",
+  "last_audited": "2026-10-27T11:42:00+07:00",
+  "audited_by": "SevZia & AI-LEAD&BA",
   "slot_bindings": [
     {
       "slot": "CONVERSATION_ID_1",
