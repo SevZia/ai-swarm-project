@@ -1,6 +1,7 @@
 # Swarm Scratch & Temporary storage
 scratch/
 backups/
+uploads/
 *.tmp
 *.dump
 *.log
