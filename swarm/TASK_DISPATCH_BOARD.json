@@ -30,10 +30,10 @@
       "title": "Lập trình backend Express, API bóc tách báo giá và kết nối CSDL MySQL",
       "assigned_to": "AI-CODER",
       "assigned_conversation_id": "d97fa2d3-8aac-40c6-b843-736c2e12f5ea",
-      "status": "IN_PROGRESS",
-      "description": "Lập trình src/backend/server.js, cấu hình package.json, tích hợp Express API phục vụ frontend và kết nối CSDL.",
+      "status": "COMPLETED",
+      "description": "Đã lập trình trọn bộ Express Backend (src/backend/server.js, db.js, parser.js, test-api.js), phục vụ static frontend, 25/25 automated tests pass, commit eeb0a0d.",
       "handoff_to": "AI-AUDIT",
-      "next_action": "Coder hoàn tất viết backend, khởi động test port 3000 và bàn giao cho QA Auditor."
+      "next_action": "Bàn giao cho AI-AUDIT tiến hành kiểm toán 5 Quality Gates."
     },
     {
       "task_id": "TASK-AUDIT-001",
