@@ -1,49 +1,59 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "project_name": "ai-swarm-project",
-  "active_sprint": "SPRINT_1_DESIGN_AND_FULLSTACK_DEVELOPMENT",
-  "last_updated": "2026-10-28T11:02:00+07:00",
+  "active_sprint": "SPRINT_2_UI_POLISH_AND_PRODUCTION_ROLLOUT",
+  "last_updated": "2026-10-28T13:31:00+07:00",
   "tasks": [
     {
       "task_id": "TASK-DATA-001",
       "module": "DATABASE_MIGRATIONS",
       "title": "Thiết kế và biên soạn bộ migration DDL MySQL chuẩn cho hệ thống HDD Food",
-      "assigned_to": "AI-DATA",
+      "assigned_to": "AI-DATABASE-RESEARCHER",
       "assigned_conversation_id": "f1c79e12-370f-4378-a5da-f18731d4b014",
       "status": "COMPLETED",
       "description": "Đã tạo migrations/001_hdd_food_schema.sql tương thích 100% với AppSheet và MySQL 8.",
-      "handoff_to": "AI-AUDIT"
+      "handoff_to": "AI-AUDIT-QA"
     },
     {
       "task_id": "TASK-UI-001",
       "module": "FRONTEND_DESIGN",
       "title": "Thiết kế giao diện Web App chuyên ngành thực phẩm cho Kế toán & Kinh doanh",
-      "assigned_to": "AI-DESIGN",
-      "assigned_conversation_id": "cdd3f959-a01a-45cf-8019-38369918d2f9",
+      "assigned_to": "AI-CLIENT-UI",
+      "assigned_conversation_id": "a54b4303-c10b-40a3-90a8-b2da14b66729",
       "status": "COMPLETED",
-      "description": "Đã hoàn thành src/frontend/index.html (76.8 KB, 1520 dòng code, đầy đủ 2 phân hệ và modal tương tác).",
-      "handoff_to": "AI-CODER"
+      "description": "Đã tạo nguyên mẫu giao diện ban đầu.",
+      "handoff_to": "AI-BACKEND"
     },
     {
       "task_id": "TASK-CODE-001",
       "module": "FULLSTACK_BACKEND",
       "title": "Lập trình backend Express, API bóc tách báo giá và kết nối CSDL MySQL",
-      "assigned_to": "AI-CODER",
-      "assigned_conversation_id": "d97fa2d3-8aac-40c6-b843-736c2e12f5ea",
+      "assigned_to": "AI-BACKEND",
+      "assigned_conversation_id": "2924ea82-5cb5-448b-8412-26bc1b40db85",
       "status": "COMPLETED",
-      "description": "Đã lập trình trọn bộ Express Backend (src/backend/server.js, db.js, parser.js, test-api.js), phục vụ static frontend, 25/25 automated tests pass, commit eeb0a0d.",
-      "handoff_to": "AI-AUDIT"
+      "description": "Đã lập trình trọn bộ Express Backend (src/backend/server.js, db.js, parser.js, test-api.js), phục vụ static frontend, 25/25 automated tests pass.",
+      "handoff_to": "AI-AUDIT-QA"
     },
     {
       "task_id": "TASK-AUDIT-001",
       "module": "QUALITY_ASSURANCE",
       "title": "Kiểm toán 5 Quality Gates, bảo mật và thẩm định chạy thử nghiệm thu",
-      "assigned_to": "AI-AUDIT",
-      "assigned_conversation_id": "e645e68e-933f-4336-9aa3-87ca6a1243fb",
+      "assigned_to": "AI-AUDIT-QA",
+      "assigned_conversation_id": "b9651312-d755-453d-8890-df05bb8ed413",
       "status": "COMPLETED",
-      "description": "Kiểm toán toàn diện 5 Quality Gates đạt 100%, kiểm thử tự động 25/25 Pass, xuất chứng chỉ nghiệm thu chính thức docs/QA_AUDIT_REPORT.md.",
-      "handoff_to": "AI-LEAD",
-      "next_action": "Bàn giao về cho AI-LEAD&BA để báo cáo tổng kết và trình diễn cho Project Owner."
+      "description": "Kiểm toán toàn diện 5 Quality Gates đạt 100%, xuất chứng chỉ nghiệm thu docs/QA_AUDIT_REPORT.md.",
+      "handoff_to": "AI-LEAD"
+    },
+    {
+      "task_id": "TASK-UI-002",
+      "module": "FRONTEND_DESIGN_OPTIMIZATION",
+      "title": "Thiết kế và tối ưu hóa giao diện chuyên nghiệp cao cấp (Elite SaaS Enterprise UI) cho HDD Food",
+      "assigned_to": "AI-CLIENT-UI",
+      "assigned_conversation_id": "a54b4303-c10b-40a3-90a8-b2da14b66729",
+      "status": "ASSIGNED",
+      "description": "Nâng cấp toàn diện giao diện src/frontend/index.html theo tiêu chuẩn Enterprise SaaS: hoàn thiện hệ thống màu sắc nhận diện thực phẩm (Emerald / Beef Red), tối ưu dashboard thống kê Chart.js, hoàn thiện phân hệ Kế toán đối soát và Kinh doanh báo giá Zalo, kiểm thử tương thích đa màn hình trên mobile và desktop.",
+      "handoff_to": "AI-AUDIT-QA",
+      "next_action": "AI-CLIENT-UI kiểm tra mã nguồn giao diện, tối ưu thiết kế, commit và cập nhật TASK-UI-002 sang COMPLETED, sau đó bàn giao sang AI-AUDIT-QA kiểm toán."
     }
   ]
 }
