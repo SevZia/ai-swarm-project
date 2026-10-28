@@ -26,7 +26,7 @@
       "slot": "CONVERSATION_ID_2",
       "abstract_meta_role": "DATA_TIER_AND_STORAGE_ENGINE_ARCHITECT",
       "concrete_conversation_id": "f1c79e12-370f-4378-a5da-f18731d4b014",
-      "project_assigned_id": "AI-DATA",
+      "project_assigned_id": "AI-DATABASE-RESEARCHER",
       "project_specific_title": "Database & Data Model Architect",
       "project_specific_context": "Thiết kế CSDL quan hệ MySQL hdd_appsheet, DDL, Migrations, Views cảnh báo cận date cho HDD Food.",
       "exclusive_boundaries": [
@@ -39,42 +39,42 @@
     {
       "slot": "CONVERSATION_ID_3",
       "abstract_meta_role": "QUALITY_ASSURANCE_SECURITY_AND_INFRA_AUDITOR",
-      "concrete_conversation_id": null,
-      "project_assigned_id": "AI-AUDIT",
+      "concrete_conversation_id": "b9651312-d755-453d-8890-df05bb8ed413",
+      "project_assigned_id": "AI-AUDIT-QA",
       "project_specific_title": "Quality Gate, Security & Infra Auditor",
       "project_specific_context": "Kiểm toán 5 Quality Gates, Zero-Trust, bảo mật API, hiệu năng CSDL, cấp chứng chỉ nghiệm thu.",
       "exclusive_boundaries": [
         "QA_AUDIT_*.md",
         "tests/"
       ],
-      "status": "PENDING_JUST_IN_TIME_BINDING"
+      "status": "ACTIVE_IMMUTABLE"
     },
     {
       "slot": "CONVERSATION_ID_4",
       "abstract_meta_role": "BACKEND_SERVICES_AND_API_GATEWAY_ARCHITECT",
-      "concrete_conversation_id": null,
+      "concrete_conversation_id": "2924ea82-5cb5-448b-8412-26bc1b40db85",
       "project_assigned_id": "AI-BACKEND",
       "project_specific_title": "Backend Services & API Architect",
-      "project_specific_context": "Xây dựng RESTful API / GraphQL, xác thực JWT/SSO, background workers, event queues.",
+      "project_specific_context": "Xây dựng RESTful API, Express.js, bóc tách báo giá thực phẩm, Cloudflare Worker Gateway.",
       "exclusive_boundaries": [
         "src/backend/",
         "src/api/",
         "src/workers/"
       ],
-      "status": "PENDING_JUST_IN_TIME_BINDING"
+      "status": "ACTIVE_IMMUTABLE"
     },
     {
       "slot": "CONVERSATION_ID_5",
       "abstract_meta_role": "CLIENT_FACING_FRONTEND_SPECIALIST",
-      "concrete_conversation_id": null,
+      "concrete_conversation_id": "a54b4303-c10b-40a3-90a8-b2da14b66729",
       "project_assigned_id": "AI-CLIENT-UI",
       "project_specific_title": "Public Client Frontend / Customer Portal Specialist",
-      "project_specific_context": "Giao diện khách hàng cuối (Web SPA / Mobile App), UX, Client State, i18n đa ngôn ngữ.",
+      "project_specific_context": "Giao diện Web App chuyên ngành thực phẩm, đối soát Kế toán, tra cứu Kinh doanh, TailwindCSS.",
       "exclusive_boundaries": [
-        "src/frontend/portal/",
-        "src/client/"
+        "src/frontend/",
+        "public/"
       ],
-      "status": "PENDING_JUST_IN_TIME_BINDING"
+      "status": "ACTIVE_IMMUTABLE"
     },
     {
       "slot": "CONVERSATION_ID_6",
