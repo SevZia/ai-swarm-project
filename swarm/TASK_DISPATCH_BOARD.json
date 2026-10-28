@@ -1,19 +1,47 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "project_name": "ai-swarm-project",
-  "active_sprint": "SPRINT_1_DATA_ENGINEERING_AND_STORAGE",
-  "last_updated": "2026-10-27T04:55:13.724Z",
+  "active_sprint": "SPRINT_1_DESIGN_AND_FULLSTACK_DEVELOPMENT",
+  "last_updated": "2026-10-28T10:41:00+07:00",
   "tasks": [
     {
       "task_id": "TASK-DATA-001",
       "module": "DATABASE_MIGRATIONS",
       "title": "Thiết kế và biên soạn bộ migration DDL MySQL chuẩn cho hệ thống HDD Food",
-      "assigned_to": "AI-AUDIT",
+      "assigned_to": "AI-DATA",
       "assigned_conversation_id": "f1c79e12-370f-4378-a5da-f18731d4b014",
-      "status": "READY_FOR_AUDIT",
-      "description": "Đọc đặc tả tại docs/PROJECT_MASTER_SPECIFICATION.md. Tạo file migrations/001_hdd_food_schema.sql bao gồm DDL bảng Products, PriceHistory, InboundReceiptOCR, và View ExpiringProductsWarning. Đảm bảo cấu trúc tương thích 100% với AppSheet và MySQL 8.",
-      "handoff_to": "AI-AUDIT",
-      "next_action": "AI-AUDIT tiến hành kiểm toán bảo mật, Zero-Trust, tối ưu hóa index và thẩm định tương thích AppSheet trên migrations/001_hdd_food_schema.sql."
+      "status": "COMPLETED",
+      "description": "Đã tạo migrations/001_hdd_food_schema.sql tương thích 100% với AppSheet và MySQL 8.",
+      "handoff_to": "AI-AUDIT"
+    },
+    {
+      "task_id": "TASK-UI-001",
+      "module": "FRONTEND_DESIGN",
+      "title": "Thiết kế giao diện Web App chuyên ngành thực phẩm cho Kế toán & Kinh doanh",
+      "assigned_to": "AI-DESIGN",
+      "assigned_conversation_id": "cdd3f959-a01a-45cf-8019-38369918d2f9",
+      "status": "IN_PROGRESS",
+      "description": "Tạo giao diện src/frontend/index.html gồm 2 tab: Nhập báo giá đối soát (Kế toán) và Tra cứu giá vốn + Cảnh báo cận date (Kinh doanh).",
+      "handoff_to": "AI-CODER",
+      "next_action": "Bàn giao file index.html cho Coder để lập trình backend Express và kết nối API."
+    },
+    {
+      "task_id": "TASK-CODE-001",
+      "module": "FULLSTACK_BACKEND",
+      "title": "Lập trình backend Express, API bóc tách báo giá và kết nối CSDL MySQL",
+      "assigned_to": "AI-CODER",
+      "status": "WAITING_FOR_PREREQUISITE",
+      "description": "Nhận giao diện từ AI-DESIGN và DDL từ AI-DATA để hoàn thiện toàn bộ mã nguồn src/backend/server.js.",
+      "handoff_to": "AI-AUDIT"
+    },
+    {
+      "task_id": "TASK-AUDIT-001",
+      "module": "QUALITY_ASSURANCE",
+      "title": "Kiểm toán 5 Quality Gates, bảo mật và thẩm định chạy thử nghiệm thu",
+      "assigned_to": "AI-AUDIT",
+      "status": "WAITING_FOR_PREREQUISITE",
+      "description": "Kiểm toán trọn gói hệ thống, cấp chứng chỉ nghiệm thu QA_AUDIT_REPORT.md.",
+      "handoff_to": "AI-LEAD"
     }
   ]
 }
