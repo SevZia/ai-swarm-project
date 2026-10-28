@@ -243,13 +243,23 @@ app.get('*', (req, res) => {
 // Start Express server
 async function startServer() {
   await db.init();
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`=======================================================`);
     console.log(`🥩 HDD FOOD PRICING & INVENTORY MANAGEMENT SYSTEM`);
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📁 Serving static UI from: ${frontendPath}`);
     console.log(`📡 Ready for AppSheet sync & quotation processing`);
     console.log(`=======================================================`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`\n⚠️  CỔNG ${PORT} ĐÃ CÓ ỨNG DỤNG ĐANG CHẠY SẴN!`);
+      console.log(`👉 Bạn không cần khởi động lại, Web App đang hoạt động tại: http://localhost:${PORT}`);
+      console.log(`👉 Hãy mở trình duyệt và truy cập: http://localhost:${PORT} ngay!\n`);
+    } else {
+      console.error('Server error:', err);
+    }
   });
 }
 
