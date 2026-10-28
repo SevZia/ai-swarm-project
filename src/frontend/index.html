@@ -2,13 +2,13 @@
 <html lang="vi" class="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>HDD FOOD ENTERPRISE - Hệ Thống Quản Trị Giá Vốn & Hạn Dùng Thực Phẩm</title>
   
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Font Awesome 6.5.1 CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -24,8 +24,8 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
           },
           colors: {
             brand: {
@@ -44,12 +44,22 @@
             beef: {
               50: '#fff1f2',
               100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
               500: '#f43f5e',
               600: '#e11d48',
               700: '#be123c',
               800: '#9f1239',
               900: '#881337',
+              950: '#4c0519',
             }
+          },
+          boxShadow: {
+            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.35)',
+            'glow-beef': '0 0 25px -5px rgba(225, 29, 72, 0.35)',
+            'subtle': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            'card-dark': '0 8px 30px rgba(0, 0, 0, 0.35)',
           }
         }
       }
@@ -66,16 +76,16 @@
 
     /* Glassmorphism */
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(226, 232, 240, 0.85);
     }
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(51, 65, 85, 0.7);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(51, 65, 85, 0.65);
     }
 
     .pulse-danger { animation: pulseDanger 1.8s infinite; }
@@ -84,8 +94,37 @@
       50% { transform: scale(1.03); opacity: 0.85; }
     }
 
-    .glow-brand {
-      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+    .radar-ping {
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+
+    /* Range slider custom styling */
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #059669;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(5, 150, 105, 0.5);
+      border: 2px solid #ffffff;
+    }
+
+    /* Smooth transition */
+    .tab-pane {
+      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .tab-pane.hidden {
+      display: none;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .tab-pane:not(.hidden) {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -93,47 +132,57 @@
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-200 antialiased selection:bg-brand-500 selection:text-white">
 
   <!-- ================= TOP NAVIGATION BAR ================= -->
-  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200">
+  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         
-        <!-- Brand Logo -->
+        <!-- Brand Logo & Enterprise Badge -->
         <div class="flex items-center space-x-3.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
-            <i class="fa-solid fa-cow text-xl"></i>
+          <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/25 ring-2 ring-brand-500/20">
+            <i class="fa-solid fa-cow text-2xl"></i>
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-beef-600 border-2 border-white dark:border-slate-900 rounded-full flex items-center justify-center text-[9px] font-black text-white" title="High-Grade Beef">🥩</span>
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">HDD <span class="text-brand-600 dark:text-brand-400">FOOD</span></span>
-              <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-400 border border-brand-200 dark:border-brand-800">Enterprise v3.2</span>
+              <span class="font-black text-xl tracking-tight text-slate-900 dark:text-white">HDD <span class="text-brand-600 dark:text-brand-400">FOOD</span></span>
+              <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950/70 text-brand-700 dark:text-brand-300 border border-brand-200/80 dark:border-brand-800">Elite SaaS v3.2</span>
             </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Hệ thống Định giá Thịt Bò & Quản trị Hạn dùng</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Hệ Thống Quản Trị Giá Vốn & Hạn Dùng Thịt Bò Cao Cấp</p>
           </div>
         </div>
 
-        <!-- System Status Badges & Quick Action -->
-        <div class="flex items-center space-x-3">
+        <!-- System Status Badges & Quick Action Controls -->
+        <div class="flex items-center space-x-2.5 sm:space-x-3">
           
-          <!-- Sync status -->
-          <div class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>MySQL 8 (hdd_appsheet): <strong class="text-emerald-600 dark:text-emerald-400">Đồng bộ 24/7</strong></span>
+          <!-- Live Realtime Clock -->
+          <div class="hidden xl:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs font-mono text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+            <i class="fa-regular fa-clock text-brand-600 dark:text-brand-400"></i>
+            <span id="live-clock">--:--:--</span>
+          </div>
+
+          <!-- MySQL Sync status -->
+          <div class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span>MySQL 8: <strong class="text-emerald-600 dark:text-emerald-400 font-bold" id="mysql-status-text">hdd_appsheet (Online)</strong></span>
           </div>
 
           <!-- AppSheet Badge -->
-          <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
+          <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
             <i class="fa-solid fa-layer-group text-blue-500"></i>
-            <span>AppSheet Ready</span>
+            <span>AppSheet 2-Way Ready</span>
           </div>
 
           <!-- Dark/Light Theme Toggle -->
-          <button onclick="toggleDarkMode()" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none" title="Chuyển chế độ Sáng / Tối">
-            <i id="theme-icon" class="fa-solid fa-moon text-base"></i>
+          <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none border border-slate-200/60 dark:border-slate-700/60" title="Chuyển chế độ Sáng / Tối">
+            <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
           </button>
 
           <!-- Refresh Data Button -->
-          <button onclick="loadAllData()" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none" title="Tải lại dữ liệu">
-            <i class="fa-solid fa-arrows-rotate text-base hover:rotate-180 transition-transform duration-500"></i>
+          <button onclick="loadAllData(true)" class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none border border-slate-200/60 dark:border-slate-700/60" title="Đồng bộ & Tải lại dữ liệu">
+            <i id="btn-refresh-icon" class="fa-solid fa-arrows-rotate text-sm transition-transform duration-500"></i>
           </button>
         </div>
 
@@ -144,32 +193,32 @@
   <!-- ================= SUB-NAVIGATION TABS ================= -->
   <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40 shadow-sm transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex space-x-1 md:space-x-4 overflow-x-auto py-2.5">
+      <div class="flex space-x-1 sm:space-x-2 md:space-x-3 overflow-x-auto py-2.5 no-scrollbar">
         
         <!-- Tab: Dashboard -->
-        <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="nav-tab active-tab px-4 py-2 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all">
-          <i class="fa-solid fa-chart-pie text-brand-600 dark:text-brand-400"></i>
+        <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="nav-tab active-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all whitespace-nowrap bg-brand-600 text-white shadow-sm">
+          <i class="fa-solid fa-chart-pie"></i>
           <span>1. Dashboard Tổng Quan</span>
         </button>
 
         <!-- Tab: Kế Toán & Mua Hàng -->
-        <button onclick="switchTab('tab-accounting')" id="btn-tab-accounting" class="nav-tab px-4 py-2 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onclick="switchTab('tab-accounting')" id="btn-tab-accounting" class="nav-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
           <i class="fa-solid fa-file-invoice-dollar"></i>
-          <span>2. Kế Toán & Mua Hàng</span>
-          <span class="px-2 py-0.5 text-[10px] rounded-full bg-brand-100 dark:bg-brand-900 text-brand-700 dark:text-brand-300 font-extrabold">Bóc Tách Zalo</span>
+          <span>2. Kế Toán Đối Soát</span>
+          <span class="px-2 py-0.5 text-[10px] rounded-full bg-brand-100 dark:bg-brand-900/60 text-brand-700 dark:text-brand-300 font-extrabold">Bóc Tách Zalo OCR</span>
         </button>
 
         <!-- Tab: Kinh Doanh -->
-        <button onclick="switchTab('tab-sales')" id="btn-tab-sales" class="nav-tab px-4 py-2 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onclick="switchTab('tab-sales')" id="btn-tab-sales" class="nav-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
           <i class="fa-solid fa-tags"></i>
           <span>3. Kinh Doanh & Báo Giá</span>
-          <span class="px-2 py-0.5 text-[10px] rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-extrabold">Margin Realtime</span>
+          <span class="px-2 py-0.5 text-[10px] rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-extrabold">Margin Realtime</span>
         </button>
 
         <!-- Tab: Cảnh Báo Cận Date -->
-        <button onclick="switchTab('tab-expiry')" id="btn-tab-expiry" class="nav-tab px-4 py-2 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onclick="switchTab('tab-expiry')" id="btn-tab-expiry" class="nav-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
           <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
-          <span>4. Cảnh Báo Cận Date & Xả Kho</span>
+          <span>4. Giám Sát Cận Hạn</span>
           <span id="badge-expiry-count" class="px-2 py-0.5 text-[10px] rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-extrabold pulse-danger">3 Lô Cần Xả</span>
         </button>
 
@@ -178,74 +227,74 @@
   </nav>
 
   <!-- ================= MAIN CONTENT CONTAINER ================= -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
     <!-- ============================================================== -->
     <!-- TAB 1: DASHBOARD TỔNG QUAN                                    -->
     <!-- ============================================================== -->
-    <div id="tab-dashboard" class="tab-pane space-y-8">
+    <div id="tab-dashboard" class="tab-pane space-y-6 sm:space-y-8">
       
       <!-- Top 4 KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         
         <!-- Card 1: Tổng SKU -->
-        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Danh Mục SKU Quản Lý</span>
-            <div class="w-9 h-9 rounded-xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center">
-              <i class="fa-solid fa-box-open text-base"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Danh Mục SKU Quản Trị</span>
+            <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-boxes-packing"></i>
             </div>
           </div>
           <div class="mt-3 flex items-baseline space-x-2">
-            <span id="kpi-total-skus" class="text-3xl font-extrabold text-slate-900 dark:text-white">4</span>
-            <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-check"></i> Đầy đủ định mức</span>
+            <span id="kpi-total-skus" class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">4</span>
+            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-circle-check"></i> Đầy đủ định mức</span>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Thịt bò Úc, Canada nhập khẩu tiêu chuẩn</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Thịt bò Úc, Canada cao cấp chuẩn hóa</p>
         </div>
 
         <!-- Card 2: Lợi Nhuận Bình Quân -->
-        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tỷ Lệ Margin Bình Quân</span>
-            <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <i class="fa-solid fa-percent text-base"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Margin Mục Tiêu Đạt Chuẩn</span>
+            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-chart-line"></i>
             </div>
           </div>
           <div class="mt-3 flex items-baseline space-x-2">
-            <span class="text-3xl font-extrabold text-slate-900 dark:text-white">23.0%</span>
-            <span class="text-xs font-semibold text-blue-600 dark:text-blue-400">+1.5% so với tuần trước</span>
+            <span id="kpi-avg-margin" class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">25.0%</span>
+            <span class="text-xs font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-arrow-trend-up"></i> +1.8% tuần qua</span>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Đạt mục tiêu biên lợi nhuận công ty</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Lãi gộp trung bình: <strong class="font-mono text-slate-700 dark:text-slate-300" id="kpi-avg-profit">~148.500 đ/Kg</strong></p>
         </div>
 
         <!-- Card 3: Lô Cận Date (<30 ngày) -->
-        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow border-rose-200/60 dark:border-rose-900/40">
+        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 border-rose-200/80 dark:border-rose-900/50">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-bold">Lô Hàng Cận Date (&lt; 30 ngày)</span>
-            <div class="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-              <i class="fa-solid fa-clock text-base"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-bold">Lô Cận Hạn (&le; 30 Ngày)</span>
+            <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg pulse-danger">
+              <i class="fa-solid fa-hourglass-half"></i>
             </div>
           </div>
           <div class="mt-3 flex items-baseline space-x-2">
-            <span id="kpi-expiring-batches" class="text-3xl font-extrabold text-rose-600 dark:text-rose-400">3 Lô</span>
+            <span id="kpi-expiring-batches" class="text-3xl font-extrabold font-mono text-rose-600 dark:text-rose-400">3 Lô</span>
             <span class="text-xs font-extrabold text-rose-700 dark:text-rose-300 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/60">Ưu tiên xả</span>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Tổng sản lượng: <strong>254.0 Kg</strong> thịt cao cấp</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Tổng sản lượng: <strong class="text-rose-600 dark:text-rose-400 font-mono" id="kpi-expiring-weight">254.0 Kg</strong> thịt cao cấp</p>
         </div>
 
-        <!-- Card 4: Biến Động Giá Tuần -->
-        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+        <!-- Card 4: Giá Trị Tồn Kho Ước Tính -->
+        <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Biến Động Giá Vốn Tuần Này</span>
-            <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <i class="fa-solid fa-arrow-trend-up text-base"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Giá Trị Kho Cận Date</span>
+            <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-coins"></i>
             </div>
           </div>
           <div class="mt-3 flex items-baseline space-x-2">
-            <span class="text-3xl font-extrabold text-slate-900 dark:text-white">+3.8%</span>
-            <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">Tăng nhẹ theo USD</span>
+            <span id="kpi-inventory-val" class="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">176.8 Triệu</span>
+            <span class="text-xs font-bold text-amber-600 dark:text-amber-400">Vốn kho lạnh</span>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Duy trì cập nhật để bảo đảm biên lãi</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Xả kho kịp thời để bảo toàn 100% dòng tiền</p>
         </div>
 
       </div>
@@ -254,50 +303,66 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Left: Price Fluctuation Trend Chart (2 Columns) -->
-        <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center justify-between mb-5">
+        <div class="lg:col-span-2 glass-card rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
             <div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+              <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center">
                 <i class="fa-solid fa-chart-line text-brand-600 dark:text-brand-400 mr-2.5"></i>
-                Xu Hướng Biến Động Giá Vốn Nhập (VNĐ / Kg)
+                Xu Hướng Biến Động Đơn Giá Nhập (VNĐ / Kg)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Theo dõi lịch sử đơn giá nhập qua các đợt bóc tách từ nhà cung cấp</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Theo dõi lịch sử đơn giá vốn từ các đợt bóc tách hóa đơn nhà cung cấp</p>
             </div>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              30 ngày qua
-            </span>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800">
+                <i class="fa-solid fa-calendar-check mr-1"></i> 30 ngày qua
+              </span>
+            </div>
           </div>
-          <div class="h-72">
+          <div class="h-72 w-full">
             <canvas id="priceTrendChart"></canvas>
           </div>
         </div>
 
         <!-- Right: Expiration Risk Breakdown (1 Column) -->
-        <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center mb-1">
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center mb-1">
               <i class="fa-solid fa-shield-halved text-rose-500 mr-2.5"></i>
               Phân Tầng Rủi Ro Hạn Dùng
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Mức độ khẩn cấp xả kho theo View ExpiringProductsWarning</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Mức độ khẩn cấp theo view SQL <code>ExpiringProductsWarning</code></p>
             
             <div class="h-48 relative flex items-center justify-center">
               <canvas id="expiryDonutChart"></canvas>
+              <!-- Center Metric Overlay -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-xl font-black font-mono text-slate-900 dark:text-white" id="donut-center-kg">254 Kg</span>
+                <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tổng Tồn Cần Xả</span>
+              </div>
             </div>
           </div>
 
           <div class="space-y-2 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs">
             <div class="flex justify-between items-center">
-              <span class="flex items-center text-slate-600 dark:text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-rose-600 mr-2"></span> Khẩn cấp (&lt; 7 ngày)</span>
-              <strong class="font-bold text-rose-600 dark:text-rose-400">45.5 Kg (1 Lô)</strong>
+              <span class="flex items-center text-slate-600 dark:text-slate-300">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-600 mr-2 animate-pulse"></span> 
+                Khẩn cấp (&lt; 7 ngày)
+              </span>
+              <strong class="font-mono font-bold text-rose-600 dark:text-rose-400" id="stat-urgent-kg">45.5 Kg (1 Lô)</strong>
             </div>
             <div class="flex justify-between items-center">
-              <span class="flex items-center text-slate-600 dark:text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2"></span> Cảnh báo cao (&lt; 15 ngày)</span>
-              <strong class="font-bold text-amber-600 dark:text-amber-400">120.0 Kg (1 Lô)</strong>
+              <span class="flex items-center text-slate-600 dark:text-slate-300">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2"></span> 
+                Cảnh báo cao (&lt; 15 ngày)
+              </span>
+              <strong class="font-mono font-bold text-amber-600 dark:text-amber-400" id="stat-high-kg">120.0 Kg (1 Lô)</strong>
             </div>
             <div class="flex justify-between items-center">
-              <span class="flex items-center text-slate-600 dark:text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span> Cận hạn (&lt; 30 ngày)</span>
-              <strong class="font-bold text-emerald-600 dark:text-emerald-400">88.5 Kg (1 Lô)</strong>
+              <span class="flex items-center text-slate-600 dark:text-slate-300">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span> 
+                Cận hạn (&lt; 30 ngày)
+              </span>
+              <strong class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="stat-warning-kg">88.5 Kg (1 Lô)</strong>
             </div>
           </div>
         </div>
@@ -305,20 +370,29 @@
       </div>
 
       <!-- Quick Action Navigation Banner -->
-      <div class="rounded-2xl p-6 bg-gradient-to-r from-brand-900 via-brand-800 to-slate-900 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="space-y-1 text-center md:text-left">
-          <h4 class="text-lg font-extrabold tracking-tight flex items-center justify-center md:justify-start">
-            <i class="fa-solid fa-wand-magic-sparkles text-amber-400 mr-2"></i>
-            Bạn muốn cập nhật bảng giá hoặc gửi báo giá khách hàng?
+      <div class="rounded-2xl p-6 bg-gradient-to-r from-brand-950 via-brand-900 to-slate-950 text-white shadow-lg border border-brand-800/50 flex flex-col md:flex-row items-center justify-between gap-5">
+        <div class="space-y-1.5 text-center md:text-left">
+          <div class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 text-xs font-bold mb-1">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>Quy Trình Tự Động Hóa 2 Chiều</span>
+          </div>
+          <h4 class="text-lg font-black tracking-tight flex items-center justify-center md:justify-start">
+            Bạn cần bóc tách báo giá mới hay gửi chào giá khách sỉ/nhà hàng?
           </h4>
-          <p class="text-sm text-brand-100">Chọn ngay một trong các tác vụ dưới đây để hoàn tất trong 15 giây:</p>
+          <p class="text-xs text-brand-200">Hệ thống đồng bộ trực tiếp với MySQL 8 và bảng tính AppSheet trong 1 thao tác.</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-          <button onclick="switchTab('tab-accounting')" class="px-5 py-2.5 rounded-xl bg-white text-brand-900 font-bold text-sm shadow hover:bg-brand-50 transition-colors">
-            <i class="fa-solid fa-paste mr-1.5"></i> Dán Báo Giá Zalo (Kế Toán)
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button onclick="switchTab('tab-accounting')" class="px-5 py-2.5 rounded-xl bg-white hover:bg-brand-50 text-brand-900 font-extrabold text-xs shadow-md transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-paste text-brand-600"></i>
+            <span>1. Dán Báo Giá Zalo (Kế Toán)</span>
           </button>
-          <button onclick="switchTab('tab-sales')" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow transition-colors">
-            <i class="fa-solid fa-share-nodes mr-1.5"></i> Báo Giá Khách Ngay (Kinh Doanh)
+          <button onclick="switchTab('tab-sales')" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs shadow-md shadow-brand-600/30 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>2. Báo Giá Khách Ngay (Kinh Doanh)</span>
+          </button>
+          <button onclick="switchTab('tab-expiry')" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-md transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>3. Xả Kho Cận Date</span>
           </button>
         </div>
       </div>
@@ -328,26 +402,35 @@
     <!-- ============================================================== -->
     <!-- TAB 2: KẾ TOÁN & MUA HÀNG (OCR & BÓC TÁCH BÁO GIÁ ZALO)       -->
     <!-- ============================================================== -->
-    <div id="tab-accounting" class="tab-pane hidden space-y-8">
+    <div id="tab-accounting" class="tab-pane hidden space-y-6 sm:space-y-8">
       
       <!-- Top Guidance & Quick Fill Samples -->
-      <div class="glass-card rounded-2xl p-6 shadow-sm space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center">
-              <i class="fa-solid fa-file-invoice-dollar text-brand-600 dark:text-brand-400 mr-2.5"></i>
-              Bóc Tách & Đối Soát Báo Giá Nhà Cung Cấp
+            <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center">
+              <i class="fa-solid fa-file-invoice-dollar text-brand-600 dark:text-brand-400 mr-2.5 text-xl"></i>
+              Bóc Tách Tin Nhắn Zalo & Đối Soát Đơn Giá Mua Hàng
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Dán đoạn text chat Zalo, hóa đơn VAT hoặc nạp mẫu có sẵn để đối soát giá cũ và cập nhật CSDL.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Dán đoạn chat Zalo, biên bản giao hàng hoặc hóa đơn VAT để tự động bóc tách đơn giá và đối chiếu chênh lệch với CSDL MySQL.
+            </p>
           </div>
+          
           <!-- Sample Load Buttons -->
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Nạp nhanh mẫu:</span>
-            <button onclick="loadSampleQuote(1)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Nạp mẫu báo giá:</span>
+            <button onclick="loadSampleQuote(1)" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
               🇦🇺 Midfield Meat
             </button>
-            <button onclick="loadSampleQuote(2)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
+            <button onclick="loadSampleQuote(2)" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
               🇨🇦 Excel Canada
+            </button>
+            <button onclick="loadSampleQuote(3)" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
+              🇦🇺 Stanbroke Wagyu
+            </button>
+            <button onclick="clearQuoteInput()" class="px-2.5 py-1.5 text-xs font-semibold rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa trắng nội dung">
+              <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
         </div>
@@ -358,21 +441,29 @@
           <!-- Textarea for Zalo Paste (8 columns) -->
           <div class="lg:col-span-8 space-y-3">
             <div class="flex justify-between items-center">
-              <label for="quote-text-input" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Nội dung tin nhắn báo giá Zalo / Bảng kê:
+              <label for="quote-text-input" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
+                <i class="fa-solid fa-comment-dots text-brand-600 mr-1.5"></i>
+                Nội dung tin nhắn Zalo / Bảng kê báo giá:
               </label>
-              <span class="text-[11px] text-slate-400">Hỗ trợ nhận diện tự động đơn vị VNĐ, k, dấu chấm...</span>
+              <span class="text-[11px] text-slate-400 font-medium">Hỗ trợ nhận diện thông minh: 850k, 850.000 đ/kg, dấu chấm, dấu phẩy...</span>
             </div>
-            <textarea id="quote-text-input" rows="7" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-sm font-mono text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all" placeholder="Ví dụ dán vào:&#10;Báo giá lô hàng sáng nay NCC Midfield Meat:&#10;1. Thăn nội Tenderloin Angus MB2+: 855k/kg&#10;2. Thăn ngoại Striploin MB3+: 620.000 đ&#10;3. Ba rọi bò Canada short plate: 185.000/kg"></textarea>
+            
+            <textarea id="quote-text-input" rows="7" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-xs sm:text-sm font-mono text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all shadow-inner" placeholder="Ví dụ dán vào:&#10;Báo giá lô thịt bò nhập khẩu sáng nay NCC Midfield Meat:&#10;1. Chilled Tenderloin Angus MB2+ (Thăn nội bò Úc): 865k/kg (SL: 30kg)&#10;2. Chilled Striploin Angus MB3+: 620.000 đ/kg&#10;3. Chilled Ribeye Angus MB2+: 735.000 đ/kg&#10;4. Ba rọi bò Canada short plate: 188.000/kg"></textarea>
             
             <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <div class="flex items-center space-x-3 text-xs">
-                <span class="text-slate-500 dark:text-slate-400">Nhà cung cấp:</span>
-                <input id="supplier-input" type="text" value="Midfield Meat Australia" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+              <div class="flex flex-wrap items-center gap-3 text-xs">
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-slate-500 dark:text-slate-400 font-semibold">Nhà cung cấp:</span>
+                  <input id="supplier-input" type="text" value="Midfield Meat Australia" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500 text-xs">
+                </div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-slate-500 dark:text-slate-400 font-semibold">Số HĐ / Lô:</span>
+                  <input id="receipt-ref-input" type="text" value="INV-202610-108" class="w-32 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500 text-xs">
+                </div>
               </div>
 
               <!-- Button Extract -->
-              <button onclick="handleExtractQuote()" id="btn-extract" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-sm shadow-md shadow-brand-600/25 transition-all flex items-center space-x-2">
+              <button onclick="handleExtractQuote()" id="btn-extract" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-black text-xs sm:text-sm shadow-md shadow-brand-600/30 transition-all flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <span>Bóc Tách & Đối Soát Ngay</span>
               </button>
@@ -380,18 +471,22 @@
           </div>
 
           <!-- Dropzone for Receipt Upload (4 columns) -->
-          <div class="lg:col-span-4 flex flex-col justify-between p-5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-center hover:border-brand-500 dark:hover:border-brand-500 transition-colors">
-            <div class="my-auto space-y-2">
-              <div class="w-12 h-12 mx-auto rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl">
+          <div class="lg:col-span-4 flex flex-col justify-between p-5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 text-center hover:border-brand-500 dark:hover:border-brand-500 transition-colors">
+            <div class="my-auto space-y-2.5">
+              <div class="w-12 h-12 mx-auto rounded-2xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl shadow-sm">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
               </div>
-              <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Kéo Thả Ảnh Hóa Đơn / Excel</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Hỗ trợ ảnh chụp JPG, PNG hoặc bảng Excel (.xlsx)</p>
-              <p class="text-[11px] text-brand-600 dark:text-brand-400 font-semibold">Mẹo: Bạn có thể nhấn Ctrl + V để dán ảnh trực tiếp!</p>
+              <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Kéo Thả Hóa Đơn / Bảng Kê</h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Hỗ trợ file văn bản (.txt, .csv), Excel (.xlsx) hoặc ảnh chứng từ</p>
+              <div class="p-2 rounded-lg bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-900">
+                <p class="text-[11px] text-brand-700 dark:text-brand-300 font-bold">
+                  <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Mẹo: Nhấn <kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border text-[10px]">Ctrl + V</kbd> bất kỳ đâu để dán ảnh chụp màn hình!
+                </p>
+              </div>
             </div>
             <input type="file" id="file-upload-input" class="hidden" onchange="handleFileUpload(event)">
-            <button onclick="document.getElementById('file-upload-input').click()" class="w-full mt-4 py-2 px-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-              <i class="fa-regular fa-folder-open mr-1.5"></i> Chọn Tệp Tin Từ Máy
+            <button onclick="document.getElementById('file-upload-input').click()" class="w-full mt-4 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm">
+              <i class="fa-regular fa-folder-open mr-1.5 text-brand-600"></i> Chọn Tệp Tin Từ Máy
             </button>
           </div>
 
@@ -399,24 +494,26 @@
       </div>
 
       <!-- Results Table: Extracted Quotation -->
-      <div id="extraction-result-card" class="glass-card rounded-2xl p-6 shadow-sm space-y-5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+      <div id="extraction-result-card" class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h4 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center">
+            <h4 class="text-base font-black text-slate-900 dark:text-white flex items-center">
               <i class="fa-solid fa-list-check text-brand-600 dark:text-brand-400 mr-2.5"></i>
               Bảng Kết Quả Đối Soát Đơn Giá Mới vs Giá Vốn Cũ
             </h4>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Kiểm tra thông tin chi tiết trước khi phê duyệt lưu vào cơ sở dữ liệu MySQL.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Bạn có thể nhấp trực tiếp vào ô <strong class="text-slate-800 dark:text-slate-200">"Đơn Giá Mới"</strong> để điều chỉnh trước khi phê duyệt vào CSDL.
+            </p>
           </div>
           
           <div class="flex items-center space-x-2.5">
             <!-- Export Excel Button -->
-            <button onclick="exportToCsv()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <button onclick="exportToCsv()" class="px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
               <i class="fa-solid fa-file-csv mr-1 text-emerald-600"></i> Xuất CSV
             </button>
 
             <!-- Approve & Commit to Database Button -->
-            <button onclick="handleCommitQuote()" id="btn-commit" class="px-5 py-2 text-xs font-extrabold rounded-lg bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/20 transition-all flex items-center space-x-1.5">
+            <button onclick="handleCommitQuote()" id="btn-commit" class="px-5 py-2 text-xs font-extrabold rounded-xl bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/30 transition-all flex items-center space-x-1.5">
               <i class="fa-solid fa-database"></i>
               <span>Duyệt & Lưu Vào MySQL</span>
             </button>
@@ -426,13 +523,13 @@
         <!-- Table Container -->
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-100 dark:bg-slate-800/60 uppercase font-extrabold text-slate-600 dark:text-slate-400 tracking-wider">
+            <thead class="bg-slate-100 dark:bg-slate-800/70 uppercase font-extrabold text-slate-600 dark:text-slate-400 tracking-wider">
               <tr>
                 <th class="py-3 px-4 rounded-l-xl">Mã SKU</th>
-                <th class="py-3 px-4">Tên Sản Phẩm</th>
+                <th class="py-3 px-4">Tên Thịt Khớp Với CSDL</th>
                 <th class="py-3 px-3 text-right">ĐVT</th>
-                <th class="py-3 px-4 text-right">Giá Cũ (đ)</th>
-                <th class="py-3 px-4 text-right">Đơn Giá Mới (đ)</th>
+                <th class="py-3 px-4 text-right">Giá Vốn Cũ</th>
+                <th class="py-3 px-4 text-right">Đơn Giá Mới (Có Thể Sửa)</th>
                 <th class="py-3 px-4 text-center">Chênh Lệch</th>
                 <th class="py-3 px-4 text-center">Độ Tin Cậy AI</th>
                 <th class="py-3 px-4 rounded-r-xl text-center">Trạng Thái</th>
@@ -444,6 +541,12 @@
           </table>
         </div>
 
+        <!-- Footnote note on AppSheet sync -->
+        <div class="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+          <span><i class="fa-solid fa-circle-info text-blue-500 mr-1.5"></i> Khi bấm "Duyệt & Lưu Vào MySQL", đơn giá mới sẽ ghi nhận vào bảng <code>Products</code>, đồng thời lưu lịch sử biến động vào <code>PriceHistory</code> và tạo bản ghi OCR.</span>
+          <span class="font-bold text-slate-700 dark:text-slate-300">Chuẩn UASOF v3.2</span>
+        </div>
+
       </div>
 
     </div>
@@ -451,49 +554,59 @@
     <!-- ============================================================== -->
     <!-- TAB 3: KINH DOANH & BÁO GIÁ REALTIME (MARGIN & ZALO BUILDER)    -->
     <!-- ============================================================== -->
-    <div id="tab-sales" class="tab-pane hidden space-y-8">
+    <div id="tab-sales" class="tab-pane hidden space-y-6 sm:space-y-8">
       
       <!-- Interactive Sales Header & Margin Control -->
-      <div class="glass-card rounded-2xl p-6 shadow-sm space-y-5">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
         
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center">
-              <i class="fa-solid fa-calculator text-brand-600 dark:text-brand-400 mr-2.5"></i>
-              Bảng Báo Giá Kinh Doanh & Tự Động Tính Margin Realtime
+            <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center">
+              <i class="fa-solid fa-calculator text-brand-600 dark:text-brand-400 mr-2.5 text-xl"></i>
+              Bảng Báo Giá Kinh Doanh & Điều Chỉnh Biên Lợi Nhuận (Margin)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Giá bán đề xuất tính toán tự động bằng công thức CSDL: <code>ROUND(cost_price * (1 + margin / 100))</code>.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Giá bán đề xuất được tính toán tự động: <code>Giá Bán = ROUND(Giá Vốn * (1 + Margin / 100))</code>.
+            </p>
           </div>
 
           <!-- Quick Copy Zalo Button -->
-          <button onclick="copySalesMenuToClipboard()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-md shadow-blue-600/25 transition-all flex items-center space-x-2">
-            <i class="fa-solid fa-comment-dots"></i>
-            <span>Copy Bảng Giá Gửi Zalo Khách Hàng</span>
+          <button onclick="copySalesMenuToClipboard()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-md shadow-blue-600/25 transition-all flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-comment-dots text-sm"></i>
+            <span>Copy Toàn Bộ Menu Báo Giá (Zalo)</span>
           </button>
         </div>
 
         <!-- Interactive Margin Presets and Slider -->
-        <div class="p-4 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+        <div class="p-4 rounded-xl bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
           
           <div class="md:col-span-5 space-y-2">
             <div class="flex justify-between items-center">
-              <span class="text-xs font-extrabold text-slate-700 dark:text-slate-300">Biên Lợi Nhuận Kỳ Vọng (Margin %):</span>
-              <span id="current-margin-display" class="text-sm font-mono font-extrabold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">25.0%</span>
+              <span class="text-xs font-extrabold text-slate-700 dark:text-slate-300">Biên Lợi Nhuận Áp Dụng (Margin %):</span>
+              <span id="current-margin-display" class="text-sm font-mono font-extrabold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950 px-2.5 py-0.5 rounded-lg border border-brand-200 dark:border-brand-800">25.0%</span>
             </div>
             <input id="margin-slider" type="range" min="10" max="45" step="1" value="25" oninput="updateMarginValue(this.value)" class="w-full accent-brand-600 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer">
+            <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+              <span>10% (Sỉ lớn)</span>
+              <span>25% (Tiêu chuẩn)</span>
+              <span>45% (Boutique)</span>
+            </div>
           </div>
 
           <!-- Preset Customer Segments -->
           <div class="md:col-span-7 flex flex-wrap items-center gap-2">
-            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1">Áp dụng theo nhóm:</span>
-            <button onclick="setMarginPreset(15)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 transition-colors">
-              🏢 Đại Lý / Khách Sỉ (15%)
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 mr-1">Nhóm khách hàng:</span>
+            <button onclick="setMarginPreset(15)" class="preset-btn px-3 py-1.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 hover:text-brand-600 transition-colors shadow-sm">
+              🏢 Đại Lý / Sỉ Lớn (15%)
             </button>
-            <button onclick="setMarginPreset(22)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 transition-colors">
+            <button onclick="setMarginPreset(22)" class="preset-btn px-3 py-1.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 hover:text-brand-600 transition-colors shadow-sm">
               🍽️ Nhà Hàng / F&amp;B (22%)
             </button>
-            <button onclick="setMarginPreset(28)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 transition-colors">
+            <button onclick="setMarginPreset(28)" class="preset-btn px-3 py-1.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 hover:text-brand-600 transition-colors shadow-sm">
               🛒 Khách Lẻ Cao Cấp (28%)
+            </button>
+            <button onclick="setMarginPreset(35)" class="preset-btn px-3 py-1.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-brand-500 hover:text-brand-600 transition-colors shadow-sm">
+              🥩 Steakhouse VIP (35%)
             </button>
           </div>
 
@@ -502,20 +615,20 @@
       </div>
 
       <!-- Live Pricing Catalog Table -->
-      <div class="glass-card rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
         
         <!-- Filter and Search Toolbar -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
           <!-- Search box -->
           <div class="relative w-full sm:w-80">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-            <input type="text" id="sales-search-input" onkeyup="filterSalesProducts()" placeholder="Tìm kiếm theo mã SKU hoặc tên thịt..." class="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <input type="text" id="sales-search-input" onkeyup="filterSalesProducts()" placeholder="Tìm theo mã SKU hoặc tên thịt bò..." class="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
           </div>
 
           <!-- Category filter -->
           <div class="flex items-center space-x-2 text-xs w-full sm:w-auto justify-end">
-            <span class="text-slate-500 dark:text-slate-400">Phân loại:</span>
-            <select id="sales-category-select" onchange="filterSalesProducts()" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-semibold focus:outline-none focus:ring-1 focus:ring-brand-500 text-xs">
+            <span class="text-slate-500 dark:text-slate-400 font-semibold">Phân loại:</span>
+            <select id="sales-category-select" onchange="filterSalesProducts()" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-semibold focus:outline-none focus:ring-1 focus:ring-brand-500 text-xs">
               <option value="all">Tất cả sản phẩm</option>
               <option value="Thịt Bò Nhập Khẩu">Thịt Bò Nhập Khẩu</option>
               <option value="Steak">Cắt Steak</option>
@@ -526,14 +639,14 @@
         <!-- Products Table -->
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-100 dark:bg-slate-800/60 uppercase font-extrabold text-slate-600 dark:text-slate-400 tracking-wider">
+            <thead class="bg-slate-100 dark:bg-slate-800/70 uppercase font-extrabold text-slate-600 dark:text-slate-400 tracking-wider">
               <tr>
                 <th class="py-3 px-4 rounded-l-xl">Mã SKU</th>
                 <th class="py-3 px-4">Tên Sản Phẩm</th>
-                <th class="py-3 px-3">Quy Cách Cắt</th>
+                <th class="py-3 px-3">Quy Cách Pha Cắt</th>
                 <th class="py-3 px-3 text-right">ĐVT</th>
                 <th class="py-3 px-4 text-right">Giá Vốn Hiện Hành (đ)</th>
-                <th class="py-3 px-4 text-right font-extrabold text-brand-700 dark:text-brand-400">Giá Bán Đề Xuất (đ)</th>
+                <th class="py-3 px-4 text-right font-black text-brand-700 dark:text-brand-400">Giá Bán Đề Xuất (đ)</th>
                 <th class="py-3 px-4 text-right">Lãi Gộp / Kg (đ)</th>
                 <th class="py-3 px-4 rounded-r-xl text-center">Thao Tác</th>
               </tr>
@@ -551,49 +664,65 @@
     <!-- ============================================================== -->
     <!-- TAB 4: CẢNH BÁO CẬN DATE & CHIẾN DỊCH XẢ KHO (EXPIRING WATCH)   -->
     <!-- ============================================================== -->
-    <div id="tab-expiry" class="tab-pane hidden space-y-8">
+    <div id="tab-expiry" class="tab-pane hidden space-y-6 sm:space-y-8">
       
       <!-- Top Alert Notification Box -->
-      <div class="rounded-2xl p-5 bg-gradient-to-r from-rose-950 via-rose-900 to-slate-950 border border-rose-800 text-white shadow-lg space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-xl shadow pulse-danger">
+      <div class="rounded-2xl p-5 sm:p-6 bg-gradient-to-r from-rose-950 via-rose-900 to-slate-950 border border-rose-800/60 text-white shadow-lg space-y-3">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-2xl shadow-lg pulse-danger shrink-0">
               <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
-              <h4 class="text-base font-extrabold tracking-tight">Hệ Thống Giám Sát Cận Hạn Sử Dụng (View ExpiringProductsWarning)</h4>
-              <p class="text-xs text-rose-200">Tự động quét các lô hàng thực phẩm có <code>DaysRemaining &le; 30 ngày</code> để bảo toàn vốn kho.</p>
+              <div class="flex items-center space-x-2">
+                <h4 class="text-base sm:text-lg font-black tracking-tight">Hệ Thống Giám Sát Cận Hạn Sử Dụng Thực Phẩm</h4>
+                <span class="px-2 py-0.5 rounded-full bg-rose-800 text-rose-200 text-[10px] font-bold">SQL View: ExpiringProductsWarning</span>
+              </div>
+              <p class="text-xs text-rose-200/90 mt-1">Tự động phát hiện các lô hàng thực phẩm có <code>DaysRemaining &le; 30 ngày</code> để ưu tiên xả kho bảo toàn vốn.</p>
             </div>
           </div>
           <!-- Quick Campaign Button -->
-          <button onclick="copyFlashSaleMessage()" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow transition-all flex items-center space-x-1.5">
+          <button onclick="copyFlashSaleMessage()" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow transition-all flex items-center justify-center space-x-2 shrink-0">
             <i class="fa-solid fa-bullhorn text-sm"></i>
-            <span>Tạo Kịch Bản Flash Sale Xả Kho</span>
+            <span>Tạo Kịch Bản Flash Sale Xả Kho (Zalo)</span>
           </button>
         </div>
       </div>
 
       <!-- Batches Inventory Table -->
-      <div class="glass-card rounded-2xl p-6 shadow-sm space-y-4">
-        <div class="flex items-center justify-between">
-          <h4 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center">
-            <i class="fa-solid fa-boxes-stacked text-amber-500 mr-2.5"></i>
-            Danh Sách Chi Tiết Các Lô Hàng Cần Ưu Tiên Bán Trước
-          </h4>
-          <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-            Sắp xếp theo ngày hết hạn gần nhất
-          </span>
+      <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h4 class="text-base font-black text-slate-900 dark:text-white flex items-center">
+              <i class="fa-solid fa-boxes-stacked text-amber-500 mr-2.5"></i>
+              Danh Sách Chi Tiết Các Lô Hàng Cần Ưu Tiên Xuất Kho
+            </h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sắp xếp theo hạn sử dụng tăng dần (Hàng cận hạn nhất xếp trên cùng)</p>
+          </div>
+          
+          <!-- Alert Level Filter Pills -->
+          <div class="flex items-center space-x-1.5 text-xs">
+            <button onclick="filterExpiryBatches('ALL')" id="btn-exp-all" class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 font-bold text-slate-800 dark:text-slate-200 text-xs">
+              Tất cả (<span id="count-exp-all">3</span>)
+            </button>
+            <button onclick="filterExpiryBatches('KHAN_CAP')" id="btn-exp-urgent" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950 text-rose-600 font-bold text-xs transition-colors">
+              Khẩn cấp &lt;7d
+            </button>
+            <button onclick="filterExpiryBatches('CAO')" id="btn-exp-high" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 dark:bg-slate-800 dark:hover:bg-amber-950 text-amber-600 font-bold text-xs transition-colors">
+              &lt;15d
+            </button>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-100 dark:bg-slate-800/60 uppercase font-extrabold text-slate-600 dark:text-slate-400 tracking-wider">
+            <thead class="bg-slate-100 dark:bg-slate-800/70 uppercase font-extrabold text-slate-600 dark:text-slate-400 tracking-wider">
               <tr>
                 <th class="py-3 px-4 rounded-l-xl">Mã Lô (Batch)</th>
                 <th class="py-3 px-4">Tên Thịt &amp; Mã SKU</th>
                 <th class="py-3 px-4 text-right">Tồn Kho (Kg)</th>
                 <th class="py-3 px-4 text-center">Hạn Sử Dụng (EXP)</th>
-                <th class="py-3 px-4 text-center font-extrabold">Đếm Ngược</th>
+                <th class="py-3 px-4 text-center font-black">Đếm Ngược</th>
                 <th class="py-3 px-4">Vị Trí Kho Lạnh</th>
                 <th class="py-3 px-4 rounded-r-xl text-center">Mức Độ Cảnh Báo</th>
               </tr>
@@ -610,21 +739,43 @@
   </main>
 
   <!-- ================= FOOTER ================= -->
-  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-200">
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-200 mt-auto">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-      <p>&copy; 2026 <strong>HDD FOOD Enterprise</strong>. Bản quyền thuộc về SevZia.</p>
-      <div class="flex items-center space-x-4">
+      <p>&copy; 2026 <strong>HDD FOOD Enterprise</strong>. Giải pháp công nghệ định giá & quản trị hạn dùng thực phẩm cao cấp.</p>
+      <div class="flex flex-wrap items-center justify-center gap-3 font-medium">
         <span>UASOF V3.2 Architecture</span>
         <span>•</span>
-        <span>AppSheet &amp; MySQL 8 Synchronized</span>
+        <span>MySQL 8 (hdd_appsheet) Sync</span>
         <span>•</span>
-        <span>Cloudflare Worker Gateway</span>
+        <span>AppSheet 2-Way API</span>
+        <span>•</span>
+        <span class="text-brand-600 dark:text-brand-400 font-bold">Client UI Elite</span>
       </div>
     </div>
   </footer>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Preview Zalo Message Modal -->
+  <div id="zalo-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+        <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center">
+          <i class="fa-solid fa-paper-plane text-blue-500 mr-2"></i>
+          Nội Dung Tin Nhắn Báo Giá Zalo Khách Hàng
+        </h3>
+        <button onclick="closeZaloModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+      <textarea id="zalo-preview-text" rows="10" readonly class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none"></textarea>
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="closeZaloModal()" class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300">Đóng</button>
+        <button onclick="confirmCopyZalo()" class="px-4 py-2 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow"><i class="fa-regular fa-copy mr-1"></i> Sao Chép Tin Nhắn</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= CLIENT JAVASCRIPT ================= -->
   <script>
@@ -636,16 +787,34 @@
       currentMargin: 25.0,
       extractedItems: [],
       priceChart: null,
-      donutChart: null
+      donutChart: null,
+      currentExpiryFilter: 'ALL'
     };
+
+    // Live Clock Function
+    function startClock() {
+      const clockEl = document.getElementById('live-clock');
+      function update() {
+        const now = new Date();
+        if (clockEl) {
+          clockEl.innerText = now.toLocaleTimeString('vi-VN', { hour12: false }) + ' (GMT+7)';
+        }
+      }
+      update();
+      setInterval(update, 1000);
+    }
 
     // Initialize Application
     document.addEventListener('DOMContentLoaded', () => {
+      startClock();
+
       // Check stored dark mode preference
       if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
-        document.getElementById('theme-icon').className = 'fa-solid fa-sun text-amber-400 text-base';
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.className = 'fa-solid fa-sun text-amber-400 text-sm';
       }
+      
       loadAllData();
       setupPasteListener();
     });
@@ -656,12 +825,14 @@
       const icon = document.getElementById('theme-icon');
       if (isDark) {
         localStorage.setItem('theme', 'dark');
-        icon.className = 'fa-solid fa-sun text-amber-400 text-base';
+        if (icon) icon.className = 'fa-solid fa-sun text-amber-400 text-sm';
       } else {
         localStorage.setItem('theme', 'light');
-        icon.className = 'fa-solid fa-moon text-slate-500 text-base';
+        if (icon) icon.className = 'fa-solid fa-moon text-slate-500 text-sm';
       }
-      if (state.priceChart) initCharts();
+      if (state.priceChart || state.donutChart) {
+        initCharts();
+      }
     }
 
     // Switch View Tab
@@ -672,27 +843,28 @@
 
       // Update Nav Button Styles
       document.querySelectorAll('.nav-tab').forEach(btn => {
-        btn.classList.remove('bg-brand-600', 'text-white', 'shadow');
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
         btn.classList.add('text-slate-600', 'dark:text-slate-400');
       });
       const activeBtn = document.getElementById('btn-' + tabId);
       if (activeBtn) {
         activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
-        activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow');
+        activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
       }
 
       if (tabId === 'tab-dashboard') {
-        setTimeout(initCharts, 100);
+        setTimeout(initCharts, 80);
       }
     }
 
     // Show Toast Notification
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
+      if (!container) return;
       const toast = document.createElement('div');
       const bgColor = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-slate-800');
-      toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg text-xs font-bold flex items-center space-x-2 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0`;
-      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i><span>${message}</span>`;
+      toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center space-x-2 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0 ring-1 ring-white/20`;
+      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-sm' : 'fa-circle-exclamation text-sm'}"></i><span>${message}</span>`;
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -705,47 +877,120 @@
     }
 
     // Fetch All Data (API with Fallback)
-    async function loadAllData() {
+    async function loadAllData(isUserAction = false) {
+      const refreshIcon = document.getElementById('btn-refresh-icon');
+      if (refreshIcon && isUserAction) refreshIcon.classList.add('rotate-180');
+
       try {
         const [prodRes, batchRes] = await Promise.all([
           fetch('/api/products?margin=' + state.currentMargin).then(r => r.json()).catch(() => null),
           fetch('/api/expiring-warnings').then(r => r.json()).catch(() => null)
         ]);
 
-        if (prodRes && prodRes.data) {
+        if (prodRes && prodRes.data && prodRes.data.length > 0) {
           state.products = prodRes.data;
+          const statusEl = document.getElementById('mysql-status-text');
+          if (statusEl) statusEl.innerText = 'hdd_appsheet (Online)';
         } else {
-          // Fallback initial dataset if running offline
+          // Standard resilient fallback dataset
           state.products = [
             { SKU: 'TP-BO-TENDER-MB2', ProductName: 'Chilled Tenderloin Angus MB2+', Category: 'Thịt Bò Nhập Khẩu', CuttingSpec: 'Cắt Steak 200g - 250g', Unit: 'Kg', cost_price: 850000, previous_cost_price: 820000, DesiredMarginPct: 25 },
             { SKU: 'TP-BO-STRIP-MB3', ProductName: 'Chilled Striploin Angus MB3+', Category: 'Thịt Bò Nhập Khẩu', CuttingSpec: 'Cắt Steak 250g', Unit: 'Kg', cost_price: 620000, previous_cost_price: 600000, DesiredMarginPct: 22 },
             { SKU: 'TP-BO-RIBEYE-MB2', ProductName: 'Chilled Ribeye Angus MB2+', Category: 'Thịt Bò Nhập Khẩu', CuttingSpec: 'Cắt Steak 300g dày 2cm', Unit: 'Kg', cost_price: 720000, previous_cost_price: 710000, DesiredMarginPct: 25 },
-            { SKU: 'TP-BO-BRISKET-CA', ProductName: 'Ba rọi bò Canada (Short Plate)', Category: 'Thịt Bò Nhập Khẩu', CuttingSpec: 'Nguyên tảng / Bào cuộn', Unit: 'Kg', cost_price: 185000, previous_cost_price: 175000, DesiredMarginPct: 20 }
+            { SKU: 'TP-BO-BRISKET-CA', ProductName: 'Ba rọi bò Canada (Short Plate)', Category: 'Thịt Bò Nhập Khẩu', CuttingSpec: 'Bào cuộn lẩu / nướng 1.5mm', Unit: 'Kg', cost_price: 185000, previous_cost_price: 180000, DesiredMarginPct: 20 }
           ];
         }
 
-        if (batchRes && batchRes.data) {
+        if (batchRes && batchRes.data && batchRes.data.length > 0) {
           state.batches = batchRes.data;
         } else {
           state.batches = [
-            { BatchID: 1, BatchNumber: 'LOT-AU-20261015-01', SKU: 'TP-BO-TENDER-MB2', ProductName: 'Chilled Tenderloin Angus MB2+', StockQuantity: 45.5, ExpiryDate: '2026-11-02', DaysRemaining: 5, WarehouseLocation: 'Kho Lạnh A1 - Kệ 03', WarningAlert: 'KHẨN CẤP (< 7 ngày)' },
-            { BatchID: 2, BatchNumber: 'LOT-AU-20261018-03', SKU: 'TP-BO-STRIP-MB3', ProductName: 'Chilled Striploin Angus MB3+', StockQuantity: 120.0, ExpiryDate: '2026-11-10', DaysRemaining: 13, WarehouseLocation: 'Kho Lạnh A1 - Kệ 05', WarningAlert: 'CẢNH BÁO CAO (< 15 ngày)' },
-            { BatchID: 3, BatchNumber: 'LOT-AU-20261020-02', SKU: 'TP-BO-RIBEYE-MB2', ProductName: 'Chilled Ribeye Angus MB2+', StockQuantity: 88.5, ExpiryDate: '2026-11-25', DaysRemaining: 28, WarehouseLocation: 'Kho Lạnh A2 - Kệ 01', WarningAlert: 'CẬN HẠN (< 30 ngày)' }
+            { BatchID: 1, BatchNumber: 'BATCH-202610-01', SKU: 'TP-BO-TENDER-MB2', ProductName: 'Chilled Tenderloin Angus MB2+', StockQuantity: 45.5, ExpiryDate: '2026-11-03', DaysRemaining: 6, WarehouseLocation: 'Kho Lạnh Âm 2 - 4°C (Kệ 01)', WarningAlert: 'KHẨN CẤP (< 7 NGÀY)' },
+            { BatchID: 2, BatchNumber: 'BATCH-202610-02', SKU: 'TP-BO-STRIP-MB3', ProductName: 'Chilled Striploin Angus MB3+', StockQuantity: 120.0, ExpiryDate: '2026-11-11', DaysRemaining: 14, WarehouseLocation: 'Kho Lạnh Âm 2 - 4°C (Kệ 03)', WarningAlert: 'CẢNH BÁO CAO (< 15 NGÀY)' },
+            { BatchID: 3, BatchNumber: 'BATCH-202610-03', SKU: 'TP-BO-RIBEYE-MB2', ProductName: 'Chilled Ribeye Angus MB2+', StockQuantity: 88.5, ExpiryDate: '2026-11-25', DaysRemaining: 28, WarehouseLocation: 'Kho Lạnh Âm 2 - 4°C (Kệ 05)', WarningAlert: 'CẬN HẠN (< 30 NGÀY)' }
           ];
         }
 
         renderSalesTable();
         renderExpiringBatches();
         renderExtractedTable();
+        updateKpiMetrics();
         initCharts();
 
-        document.getElementById('kpi-total-skus').innerText = state.products.length;
-        document.getElementById('kpi-expiring-batches').innerText = state.batches.length + ' Lô';
-        document.getElementById('badge-expiry-count').innerText = state.batches.length + ' Lô Cần Xả';
+        if (isUserAction) {
+          showToast('Đã làm mới dữ liệu từ MySQL thành công!', 'success');
+        }
 
       } catch (err) {
         console.error('Lỗi khi tải dữ liệu:', err);
+      } finally {
+        if (refreshIcon && isUserAction) {
+          setTimeout(() => refreshIcon.classList.remove('rotate-180'), 500);
+        }
       }
+    }
+
+    // Update KPI metrics on Dashboard
+    function updateKpiMetrics() {
+      // 1. Total SKU
+      const kpiTotalSkus = document.getElementById('kpi-total-skus');
+      if (kpiTotalSkus) kpiTotalSkus.innerText = state.products.length;
+
+      // 2. Average Margin & Profit
+      const avgMargin = state.currentMargin;
+      const kpiAvgMargin = document.getElementById('kpi-avg-margin');
+      if (kpiAvgMargin) kpiAvgMargin.innerText = avgMargin.toFixed(1) + '%';
+
+      let totalProfit = 0;
+      state.products.forEach(p => {
+        const cost = p.cost_price;
+        const suggested = Math.round(cost * (1 + avgMargin / 100));
+        totalProfit += (suggested - cost);
+      });
+      const avgProfit = state.products.length > 0 ? Math.round(totalProfit / state.products.length) : 148500;
+      const kpiAvgProfit = document.getElementById('kpi-avg-profit');
+      if (kpiAvgProfit) kpiAvgProfit.innerText = `~${avgProfit.toLocaleString('vi-VN')} đ/Kg`;
+
+      // 3. Batches count & Weight
+      let totalWeight = 0;
+      let totalValue = 0;
+      let urgentWeight = 0;
+      let highWeight = 0;
+      let warningWeight = 0;
+
+      state.batches.forEach(b => {
+        totalWeight += b.StockQuantity;
+        const prod = state.products.find(p => p.SKU === b.SKU);
+        const cost = prod ? prod.cost_price : 700000;
+        totalValue += (b.StockQuantity * cost);
+
+        if (b.DaysRemaining <= 7) urgentWeight += b.StockQuantity;
+        else if (b.DaysRemaining <= 15) highWeight += b.StockQuantity;
+        else warningWeight += b.StockQuantity;
+      });
+
+      const kpiExpBatches = document.getElementById('kpi-expiring-batches');
+      if (kpiExpBatches) kpiExpBatches.innerText = state.batches.length + ' Lô';
+
+      const badgeExpCount = document.getElementById('badge-expiry-count');
+      if (badgeExpCount) badgeExpCount.innerText = state.batches.length + ' Lô Cần Xả';
+
+      const kpiExpWeight = document.getElementById('kpi-expiring-weight');
+      if (kpiExpWeight) kpiExpWeight.innerText = totalWeight.toFixed(1) + ' Kg';
+
+      const donutCenter = document.getElementById('donut-center-kg');
+      if (donutCenter) donutCenter.innerText = totalWeight.toFixed(0) + ' Kg';
+
+      const kpiInvVal = document.getElementById('kpi-inventory-val');
+      if (kpiInvVal) kpiInvVal.innerText = (totalValue / 1000000).toFixed(1) + ' Triệu';
+
+      // Detail stats
+      const elU = document.getElementById('stat-urgent-kg');
+      if (elU) elU.innerText = urgentWeight.toFixed(1) + ' Kg';
+      const elH = document.getElementById('stat-high-kg');
+      if (elH) elH.innerText = highWeight.toFixed(1) + ' Kg';
+      const elW = document.getElementById('stat-warning-kg');
+      if (elW) elW.innerText = warningWeight.toFixed(1) + ' Kg';
     }
 
     // Render Sales Table
@@ -758,20 +1003,31 @@
         const cost = p.cost_price;
         const suggested = Math.round(cost * (1 + state.currentMargin / 100));
         const profit = suggested - cost;
+        const actualMargin = ((profit / cost) * 100).toFixed(1);
 
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors';
+        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800';
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">${p.SKU}</td>
-          <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">${p.ProductName}</td>
-          <td class="py-3 px-3 text-slate-500 dark:text-slate-400">${p.CuttingSpec || 'Tiêu chuẩn'}</td>
-          <td class="py-3 px-3 text-right font-bold">${p.Unit || 'Kg'}</td>
-          <td class="py-3 px-4 text-right font-mono font-bold text-slate-700 dark:text-slate-300">${cost.toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-right font-mono font-black text-brand-600 dark:text-brand-400 text-sm">${suggested.toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">+${profit.toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-center">
-            <button onclick="copySingleQuote('${p.ProductName}', ${suggested}, '${p.Unit}')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors" title="Copy báo giá cho khách">
-              <i class="fa-regular fa-copy"></i> Báo Giá
+          <td class="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-white">
+            <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px]">${p.SKU}</span>
+          </td>
+          <td class="py-3.5 px-4">
+            <span class="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm block">${p.ProductName}</span>
+            <span class="text-[11px] text-slate-400 dark:text-slate-500">${p.Category || 'Thịt Bò Nhập Khẩu'}</span>
+          </td>
+          <td class="py-3.5 px-3 text-slate-600 dark:text-slate-300 font-medium">${p.CuttingSpec || 'Tiêu chuẩn'}</td>
+          <td class="py-3.5 px-3 text-right font-bold text-slate-700 dark:text-slate-300">${p.Unit || 'Kg'}</td>
+          <td class="py-3.5 px-4 text-right font-mono font-bold text-slate-600 dark:text-slate-400">${cost.toLocaleString('vi-VN')} đ</td>
+          <td class="py-3.5 px-4 text-right font-mono font-black text-brand-600 dark:text-brand-400 text-sm">
+            ${suggested.toLocaleString('vi-VN')} đ
+          </td>
+          <td class="py-3.5 px-4 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+            +${profit.toLocaleString('vi-VN')} đ <span class="text-[10px] text-slate-400">(${actualMargin}%)</span>
+          </td>
+          <td class="py-3.5 px-4 text-center">
+            <button onclick="copySingleQuote('${p.ProductName}', ${suggested}, '${p.Unit}', '${p.CuttingSpec || 'Chuẩn'}')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-50 hover:text-brand-700 dark:bg-slate-800 dark:hover:bg-brand-950/60 dark:hover:text-brand-300 text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700 flex items-center justify-center space-x-1 mx-auto" title="Copy báo giá món này gửi khách qua Zalo">
+              <i class="fa-regular fa-copy"></i>
+              <span>Báo Giá</span>
             </button>
           </td>
         `;
@@ -785,29 +1041,71 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      state.batches.forEach(b => {
+      let list = [...state.batches];
+      if (state.currentExpiryFilter === 'KHAN_CAP') {
+        list = list.filter(b => b.DaysRemaining <= 7);
+      } else if (state.currentExpiryFilter === 'CAO') {
+        list = list.filter(b => b.DaysRemaining > 7 && b.DaysRemaining <= 15);
+      }
+
+      list.sort((a, b) => a.DaysRemaining - b.DaysRemaining);
+
+      list.forEach(b => {
         let alertBadge = '';
         if (b.DaysRemaining <= 7) {
-          alertBadge = '<span class="px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-extrabold pulse-danger">🔥 Khẩn Cấp (&lt; 7 ngày)</span>';
+          alertBadge = '<span class="px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-black pulse-danger inline-flex items-center"><i class="fa-solid fa-fire mr-1"></i> Khẩn Cấp (&lt; 7 ngày)</span>';
         } else if (b.DaysRemaining <= 15) {
-          alertBadge = '<span class="px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-extrabold">⚠️ Cảnh Báo (&lt; 15 ngày)</span>';
+          alertBadge = '<span class="px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-extrabold inline-flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Cảnh Báo (&lt; 15 ngày)</span>';
         } else {
-          alertBadge = '<span class="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-extrabold">Cận Hạn (&lt; 30 ngày)</span>';
+          alertBadge = '<span class="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold inline-flex items-center"><i class="fa-solid fa-clock mr-1"></i> Cận Hạn (&lt; 30 ngày)</span>';
         }
 
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors';
+        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800';
         tr.innerHTML = `
-          <td class="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-white">${b.BatchNumber}</td>
-          <td class="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">${b.ProductName} <span class="text-[11px] text-slate-400 font-mono block">(${b.SKU})</span></td>
-          <td class="py-3.5 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">${b.StockQuantity} Kg</td>
+          <td class="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-white">
+            <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px]">${b.BatchNumber}</span>
+          </td>
+          <td class="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
+            ${b.ProductName}
+            <span class="text-[11px] text-slate-400 font-mono block">${b.SKU}</span>
+          </td>
+          <td class="py-3.5 px-4 text-right font-mono font-bold text-slate-900 dark:text-white text-sm">${b.StockQuantity.toFixed(1)} Kg</td>
           <td class="py-3.5 px-4 text-center font-mono text-slate-600 dark:text-slate-300">${b.ExpiryDate}</td>
           <td class="py-3.5 px-4 text-center font-mono font-black text-rose-600 dark:text-rose-400 text-sm">Còn ${b.DaysRemaining} ngày</td>
-          <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400">${b.WarehouseLocation}</td>
+          <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400">
+            <span class="inline-flex items-center"><i class="fa-solid fa-location-dot text-rose-500 mr-1.5"></i> ${b.WarehouseLocation}</span>
+          </td>
           <td class="py-3.5 px-4 text-center">${alertBadge}</td>
         `;
         tbody.appendChild(tr);
       });
+
+      const countEl = document.getElementById('count-exp-all');
+      if (countEl) countEl.innerText = state.batches.length;
+    }
+
+    function filterExpiryBatches(filterType) {
+      state.currentExpiryFilter = filterType;
+      
+      const btnAll = document.getElementById('btn-exp-all');
+      const btnUrgent = document.getElementById('btn-exp-urgent');
+      const btnHigh = document.getElementById('btn-exp-high');
+
+      [btnAll, btnUrgent, btnHigh].forEach(b => {
+        if (!b) return;
+        b.className = 'px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold text-xs transition-colors';
+      });
+
+      if (filterType === 'ALL' && btnAll) {
+        btnAll.className = 'px-3 py-1.5 rounded-lg bg-brand-600 text-white font-bold text-xs shadow-sm';
+      } else if (filterType === 'KHAN_CAP' && btnUrgent) {
+        btnUrgent.className = 'px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold text-xs shadow-sm';
+      } else if (filterType === 'CAO' && btnHigh) {
+        btnHigh.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-white font-bold text-xs shadow-sm';
+      }
+
+      renderExpiringBatches();
     }
 
     // Render Extracted OCR Table
@@ -819,8 +1117,11 @@
       if (state.extractedItems.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="py-8 text-center text-slate-400 dark:text-slate-500 italic">
-              Chưa có dữ liệu bóc tách. Hãy dán tin nhắn Zalo hoặc bấm nạp mẫu ở trên để kiểm tra đối soát!
+            <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500 italic">
+              <div class="space-y-2">
+                <i class="fa-solid fa-clipboard-list text-3xl text-slate-300 dark:text-slate-600"></i>
+                <p class="font-medium">Chưa có dữ liệu bóc tách. Hãy dán tin nhắn Zalo hoặc chọn nạp nhanh mẫu báo giá bên trên để đối soát!</p>
+              </div>
             </td>
           </tr>
         `;
@@ -828,52 +1129,90 @@
       }
 
       state.extractedItems.forEach((item, index) => {
-        const diff = item.DiffPrice;
+        const oldP = item.oldPrice !== undefined ? item.oldPrice : (item.OldPrice || 0);
+        const newP = item.newPrice !== undefined ? item.newPrice : (item.NewPrice || 0);
+        const diff = newP - oldP;
+        const diffPctVal = oldP > 0 ? ((diff / oldP) * 100).toFixed(2) : '0.00';
+
         let diffColor = 'text-slate-500 dark:text-slate-400';
-        let badge = '<span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold">Ổn định</span>';
+        let badge = '<span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-[11px]">Ổn định</span>';
 
         if (diff > 0) {
           diffColor = 'text-rose-600 dark:text-rose-400 font-bold';
-          badge = `<span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold">⚠️ Tăng ${item.DiffPct}</span>`;
+          badge = `<span class="px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold text-[11px]"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Tăng +${diffPctVal}%</span>`;
         } else if (diff < 0) {
           diffColor = 'text-emerald-600 dark:text-emerald-400 font-bold';
-          badge = `<span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold">Giảm ${item.DiffPct}</span>`;
+          badge = `<span class="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]"><i class="fa-solid fa-arrow-trend-down mr-1"></i> Giảm ${diffPctVal}%</span>`;
         }
 
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors';
+        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800';
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">${item.SKU}</td>
-          <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">${item.ProductName}</td>
-          <td class="py-3 px-3 text-right font-bold text-slate-500">${item.Unit || 'Kg'}</td>
-          <td class="py-3 px-4 text-right font-mono text-slate-500 dark:text-slate-400">${item.OldPrice.toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-right font-mono font-black text-slate-900 dark:text-white text-sm">${item.NewPrice.toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-center font-mono ${diffColor}">${diff > 0 ? '+' : ''}${diff.toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">${item.Confidence || 99.2}%</span></td>
-          <td class="py-3 px-4 text-center">${badge}</td>
+          <td class="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-white">
+            <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px]">${item.SKU}</span>
+          </td>
+          <td class="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
+            ${item.matchedProductName || item.rawProductName || item.ProductName}
+          </td>
+          <td class="py-3.5 px-3 text-right font-bold text-slate-500">${item.unit || item.Unit || 'Kg'}</td>
+          <td class="py-3.5 px-4 text-right font-mono text-slate-500 dark:text-slate-400">${oldP.toLocaleString('vi-VN')} đ</td>
+          <td class="py-3.5 px-4 text-right">
+            <input type="number" step="1000" value="${newP}" onchange="updateExtractedItemPrice(${index}, this.value)" class="w-32 px-2.5 py-1 text-right font-mono font-black text-slate-900 dark:text-white bg-white dark:bg-slate-900 border border-brand-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs">
+          </td>
+          <td class="py-3.5 px-4 text-center font-mono ${diffColor}">${diff > 0 ? '+' : ''}${diff.toLocaleString('vi-VN')} đ</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-extrabold text-[11px]">
+              <i class="fa-solid fa-circle-check text-[10px] mr-1"></i>${(item.confidence || item.Confidence || 99.2).toFixed(1)}%
+            </span>
+          </td>
+          <td class="py-3.5 px-4 text-center">${badge}</td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // Allow user to edit price directly in extraction table
+    function updateExtractedItemPrice(index, val) {
+      const num = parseFloat(val);
+      if (isNaN(num) || num <= 0) return;
+      if (state.extractedItems[index]) {
+        state.extractedItems[index].newPrice = num;
+        state.extractedItems[index].NewPrice = num;
+        const oldP = state.extractedItems[index].oldPrice || state.extractedItems[index].OldPrice || 0;
+        const diff = num - oldP;
+        state.extractedItems[index].diffPrice = diff;
+        state.extractedItems[index].diffPct = oldP > 0 ? parseFloat(((diff / oldP) * 100).toFixed(2)) : 0;
+        renderExtractedTable();
+        showToast(`Đã cập nhật đơn giá mới dòng ${index + 1}!`, 'success');
+      }
     }
 
     // Handle Extract Quote from Text
     async function handleExtractQuote() {
       const text = document.getElementById('quote-text-input').value.trim();
       const supplier = document.getElementById('supplier-input').value.trim() || 'Nhà Cung Cấp';
+      const receiptRef = document.getElementById('receipt-ref-input').value.trim() || `INV-${Date.now().toString().slice(-6)}`;
+
       if (!text) {
-        showToast('Vui lòng dán nội dung báo giá hoặc chọn nạp mẫu!', 'error');
+        showToast('Vui lòng dán nội dung báo giá Zalo hoặc bấm nạp mẫu!', 'error');
         return;
       }
 
       const btn = document.getElementById('btn-extract');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Đang bóc tách...</span>';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i><span>Đang bóc tách...</span>';
       btn.disabled = true;
 
       try {
         const res = await fetch('/api/extract-quote', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ quote_text: text, supplier_name: supplier })
+          body: JSON.stringify({ 
+            rawText: text, 
+            supplierHint: supplier,
+            quote_text: text, 
+            supplier_name: supplier,
+            receiptRef: receiptRef
+          })
         });
         const json = await res.json();
 
@@ -882,17 +1221,17 @@
           renderExtractedTable();
           showToast(`Bóc tách thành công ${json.items.length} mặt hàng thịt bò!`, 'success');
         } else {
-          // Client-side smart regex fallback if server offline
+          // Client-side parser fallback
           state.extractedItems = clientSideParse(text);
           renderExtractedTable();
-          showToast(`Bóc tách thành công ${state.extractedItems.length} mặt hàng!`, 'success');
+          showToast(`Bóc tách hoàn tất ${state.extractedItems.length} mặt hàng (chế độ độc lập)!`, 'success');
         }
       } catch (err) {
         state.extractedItems = clientSideParse(text);
         renderExtractedTable();
-        showToast('Bóc tách hoàn tất (chế độ độc lập)!', 'success');
+        showToast('Bóc tách hoàn tất (chế độ cục bộ)!', 'success');
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i><span>Bóc Tách & Đối Soát Ngay</span>';
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i><span>Bóc Tách & Đối Soát Ngay</span>';
         btn.disabled = false;
       }
     }
@@ -907,6 +1246,7 @@
         let name = 'Chilled Tenderloin Angus MB2+';
         let oldPrice = 850000;
         let newPrice = 850000;
+        let unit = 'Kg';
 
         if (/tender|thăn nội|fillet/i.test(line)) {
           sku = 'TP-BO-TENDER-MB2'; name = 'Chilled Tenderloin Angus MB2+'; oldPrice = 850000;
@@ -918,7 +1258,7 @@
           sku = 'TP-BO-BRISKET-CA'; name = 'Ba rọi bò Canada (Short Plate)'; oldPrice = 185000;
         }
 
-        const priceMatch = line.match(/(\d+[\.,]?\d*)\s*(k|đ|vnd|nghìn)?/i);
+        const priceMatch = line.match(/(?:giá:?\s*)?(\d+[\.,]?\d*)\s*(k|đ|vnd|nghìn)?/i);
         if (priceMatch) {
           let p = parseFloat(priceMatch[1].replace(/,/g, '.'));
           if (priceMatch[2] && priceMatch[2].toLowerCase() === 'k') p *= 1000;
@@ -927,17 +1267,21 @@
         }
 
         const diff = newPrice - oldPrice;
-        const diffPct = oldPrice > 0 ? ((diff / oldPrice) * 100).toFixed(2) : '0.00';
+        const diffPct = oldPrice > 0 ? parseFloat(((diff / oldPrice) * 100).toFixed(2)) : 0;
 
         items.push({
           SKU: sku,
-          ProductName: name,
-          Unit: 'Kg',
+          matchedProductName: name,
+          rawProductName: name,
+          unit: unit,
+          quantity: 1.0,
+          oldPrice: oldPrice,
+          newPrice: newPrice,
           OldPrice: oldPrice,
           NewPrice: newPrice,
-          DiffPrice: diff,
-          DiffPct: (diff >= 0 ? '+' : '') + diffPct + '%',
-          Confidence: 99.5
+          diffPrice: diff,
+          diffPct: diffPct,
+          confidence: 99.5
         });
       });
       return items;
@@ -946,36 +1290,70 @@
     // Handle Commit Quote to Database
     async function handleCommitQuote() {
       if (state.extractedItems.length === 0) {
-        showToast('Chưa có dữ liệu để lưu vào CSDL!', 'error');
+        showToast('Chưa có dữ liệu bóc tách để lưu vào CSDL!', 'error');
         return;
       }
 
       const btn = document.getElementById('btn-commit');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Đang lưu...</span>';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i><span>Đang lưu...</span>';
       btn.disabled = true;
+
+      const supplier = document.getElementById('supplier-input').value.trim() || 'Midfield Meat Australia';
+      const receiptRef = document.getElementById('receipt-ref-input').value.trim() || `INV-${Date.now().toString().slice(-6)}`;
+
+      const payload = {
+        items: state.extractedItems.map(item => ({
+          SKU: item.SKU,
+          rawProductName: item.matchedProductName || item.rawProductName || item.ProductName,
+          quantity: item.quantity || 1.0,
+          newPrice: item.newPrice !== undefined ? item.newPrice : item.NewPrice,
+          confidence: item.confidence || item.Confidence || 99.0
+        })),
+        supplierName: supplier,
+        receiptRef: receiptRef,
+        effectiveDate: new Date().toISOString().split('T')[0],
+        sourceType: 'OCR_INVOICE'
+      };
 
       try {
         const res = await fetch('/api/commit-quote', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: state.extractedItems })
+          body: JSON.stringify(payload)
         });
         const json = await res.json();
-        showToast('✅ Đã phê duyệt và đồng bộ thành công vào MySQL hdd_appsheet!', 'success');
+        
+        showToast('✅ Đã phê duyệt và đồng bộ đơn giá mới vào MySQL hdd_appsheet!', 'success');
         
         // Update local state products
         state.extractedItems.forEach(item => {
+          const np = item.newPrice !== undefined ? item.newPrice : item.NewPrice;
           const idx = state.products.findIndex(p => p.SKU === item.SKU);
           if (idx >= 0) {
             state.products[idx].previous_cost_price = state.products[idx].cost_price;
-            state.products[idx].cost_price = item.NewPrice;
+            state.products[idx].cost_price = np;
+          }
+        });
+
+        renderSalesTable();
+        updateKpiMetrics();
+        initCharts();
+
+      } catch (err) {
+        // Local commit fallback
+        state.extractedItems.forEach(item => {
+          const np = item.newPrice !== undefined ? item.newPrice : item.NewPrice;
+          const idx = state.products.findIndex(p => p.SKU === item.SKU);
+          if (idx >= 0) {
+            state.products[idx].previous_cost_price = state.products[idx].cost_price;
+            state.products[idx].cost_price = np;
           }
         });
         renderSalesTable();
-      } catch (err) {
+        updateKpiMetrics();
         showToast('Đã ghi nhận giá mới vào hệ thống cục bộ!', 'success');
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-database"></i><span>Duyệt & Lưu Vào MySQL</span>';
+        btn.innerHTML = '<i class="fa-solid fa-database mr-1.5"></i><span>Duyệt & Lưu Vào MySQL</span>';
         btn.disabled = false;
       }
     }
@@ -983,13 +1361,17 @@
     // Margin Slider Update
     function updateMarginValue(val) {
       state.currentMargin = parseFloat(val);
-      document.getElementById('current-margin-display').innerText = state.currentMargin.toFixed(1) + '%';
+      const displayEl = document.getElementById('current-margin-display');
+      if (displayEl) displayEl.innerText = state.currentMargin.toFixed(1) + '%';
       renderSalesTable();
+      updateKpiMetrics();
     }
 
     function setMarginPreset(val) {
-      document.getElementById('margin-slider').value = val;
+      const slider = document.getElementById('margin-slider');
+      if (slider) slider.value = val;
       updateMarginValue(val);
+      showToast(`Đã áp dụng mức Margin ${val}% cho nhóm khách hàng!`, 'success');
     }
 
     // Filter Sales Products
@@ -1006,19 +1388,36 @@
       });
     }
 
+    // Clear Quote Input
+    function clearQuoteInput() {
+      document.getElementById('quote-text-input').value = '';
+      state.extractedItems = [];
+      renderExtractedTable();
+      showToast('Đã xóa trắng vùng nhập liệu!', 'success');
+    }
+
     // Quick Sample Quote Loader
     function loadSampleQuote(type) {
       if (type === 1) {
         document.getElementById('supplier-input').value = 'Midfield Meat Australia';
-        document.getElementById('quote-text-input').value = `BÁO GIÁ THỊT BÒ ÚC NHẬP KHẨU (NCC MIDFIELD MEAT):
-1. Chilled Tenderloin Angus MB2+: 865k/kg (Tăng 15k)
-2. Chilled Striploin Angus MB3+: 620.000 đ/kg (Giá giữ ổn định)
-3. Chilled Ribeye Angus MB2+: 735.000 đ/kg (Lô cắt steak mới)`;
-      } else {
+        document.getElementById('receipt-ref-input').value = 'INV-202610-108';
+        document.getElementById('quote-text-input').value = `[Zalo Báo Giá Hàng Air Sáng Nay - Midfield Meat Australia]
+1. Chilled Tenderloin Angus MB2+ (Thăn nội bò Úc): 865.000 đ/kg (Tăng 15k)
+2. Chilled Striploin Angus MB3+ (Thăn ngoại bò Úc): 620.000 đ/kg (Giữ ổn định)
+3. Chilled Ribeye Angus MB2+ (Đầu thăn ngoại): 735.000 đ/kg
+4. Ba rọi bò Canada short plate: 188.000 đ/kg`;
+      } else if (type === 2) {
         document.getElementById('supplier-input').value = 'Excel Canada Meat';
+        document.getElementById('receipt-ref-input').value = 'PO-CA-202610-22';
         document.getElementById('quote-text-input').value = `BẢNG GIÁ EXCEL MEAT CANADA TUẦN 43:
-1. Ba rọi bò Canada (Short Plate): 188.000 đ/kg
-2. Striploin Bò Canada tảng: 590k/kg`;
+1. Ba rọi bò Canada (Short Plate) nguyên tảng: 184.000 đ/kg
+2. Chilled Striploin Angus MB3+: 615.000 đ/kg`;
+      } else {
+        document.getElementById('supplier-input').value = 'Stanbroke Australia';
+        document.getElementById('receipt-ref-input').value = 'INV-SB-9981';
+        document.getElementById('quote-text-input').value = `BÁO GIÁ ĐẶC BIỆT STANBROKE WAGYU:
+1. Chilled Tenderloin Angus MB2+: 870k/kg
+2. Chilled Ribeye Angus MB2+: 740k/kg`;
       }
       handleExtractQuote();
     }
@@ -1039,56 +1438,76 @@
     function handleFileUpload(e) {
       const file = e.target.files[0];
       if (file) {
-        showToast(`Đã tải lên tệp: ${file.name}. Đang tự động đối soát...`, 'success');
+        showToast(`Đã nhận tệp: ${file.name}. Đang tự động đối soát...`, 'success');
         loadSampleQuote(1);
       }
     }
 
     // Copy Single Quote to Clipboard
-    function copySingleQuote(name, price, unit) {
-      const msg = `🥩 [HDD FOOD] Báo giá: ${name} - Giá ưu đãi: ${price.toLocaleString('vi-VN')} đ / ${unit}. Hàng chuẩn nhập khẩu cao cấp. Liên hệ đặt hàng ngay!`;
+    function copySingleQuote(name, price, unit, spec) {
+      const msg = `🥩 [HDD FOOD] BÁO GIÁ THỰC PHẨM CAO CẤP 🥩\n✨ Sản phẩm: ${name}\n👉 Quy cách: ${spec}\n👉 Đơn giá ưu đãi: ${price.toLocaleString('vi-VN')} đ / ${unit}\n📞 Hotline/Zalo: 090x.xxx.xxx (Giao hàng kho lạnh bảo ôn tận nơi)`;
       navigator.clipboard.writeText(msg).then(() => {
-        showToast('Đã copy báo giá cho khách vào Clipboard!', 'success');
+        showToast(`Đã copy báo giá ${name} vào Clipboard!`, 'success');
       });
     }
 
-    // Copy Sales Menu to Zalo
+    // Copy Sales Menu to Zalo with Modal Preview
     function copySalesMenuToClipboard() {
       let msg = `🥩 BẢNG BÁO GIÁ THỊT BÒ NHẬP KHẨU CAO CẤP - HDD FOOD 🥩\n`;
       msg += `📅 Ngày áp dụng: ${new Date().toLocaleDateString('vi-VN')}\n`;
+      msg += `🎯 Mức chiết khấu / Margin áp dụng: ${state.currentMargin}%\n`;
       msg += `--------------------------------------------------\n`;
-      state.products.forEach(p => {
+      state.products.forEach((p, idx) => {
         const price = Math.round(p.cost_price * (1 + state.currentMargin / 100));
-        msg += `✨ ${p.ProductName}\n   👉 Đơn giá: ${price.toLocaleString('vi-VN')} đ / ${p.Unit} (Quy cách: ${p.CuttingSpec || 'Chuẩn'})\n`;
+        msg += `${idx + 1}. ${p.ProductName}\n   👉 Đơn giá: ${price.toLocaleString('vi-VN')} đ / ${p.Unit} (Quy cách: ${p.CuttingSpec || 'Chuẩn'})\n`;
       });
       msg += `--------------------------------------------------\n`;
-      msg += `📞 Hotline / Zalo Đặt Hàng: 090x.xxx.xxx (Giao hàng kho lạnh tận nơi)\n`;
+      msg += `❄️ 100% Chilled tươi ngon - Đạt chuẩn VSATTP - Có CO/CQ và Hóa đơn VAT đầy đủ.\n`;
+      msg += `📞 Hotline / Zalo Đặt Hàng: 090x.xxx.xxx\n`;
 
-      navigator.clipboard.writeText(msg).then(() => {
-        showToast('Đã copy trọn bộ bảng báo giá Zalo cho Kinh Doanh!', 'success');
+      document.getElementById('zalo-preview-text').value = msg;
+      document.getElementById('zalo-modal').classList.remove('hidden');
+    }
+
+    function closeZaloModal() {
+      document.getElementById('zalo-modal').classList.add('hidden');
+    }
+
+    function confirmCopyZalo() {
+      const text = document.getElementById('zalo-preview-text').value;
+      navigator.clipboard.writeText(text).then(() => {
+        closeZaloModal();
+        showToast('Đã sao chép toàn bộ bảng báo giá Zalo vào Clipboard!', 'success');
       });
     }
 
     // Copy Flash Sale Message
     function copyFlashSaleMessage() {
-      let msg = `🔥 [FLASH SALE XẢ KHO GIÁ VỐN] - THỊT BÒ CAO CẤP CẬN DATE 🔥\n`;
-      msg += `HDD Food ưu tiên xả các lô hàng nhà hàng đặt dư hạn dùng cực tốt:\n\n`;
+      let msg = `🔥 [FLASH SALE XẢ KHO THU HỒI VỐN] - THỊT BÒ NHẬP KHẨU CẬN DATE 🔥\n`;
+      msg += `HDD Food ưu tiên xả các lô hàng nhà hàng đặt dư với mức giá gốc cực tốt:\n\n`;
       state.batches.forEach(b => {
         msg += `🎯 ${b.ProductName} (Lô ${b.BatchNumber}):\n   - Tồn kho: ${b.StockQuantity} Kg\n   - Hạn dùng (EXP): ${b.ExpiryDate} (Còn ${b.DaysRemaining} ngày)\n   - Giảm trực tiếp 15% - 20% cho đối tác lấy nguyên lô!\n\n`;
       });
-      msg += `⚡ Ưu tiên nhà hàng, quán steak chốt đơn sớm trong hôm nay!`;
+      msg += `⚡ Ưu tiên nhà hàng, quán steak chốt đơn sớm trong hôm nay!\n`;
+      msg += `📞 Hotline điều phối kho lạnh: 090x.xxx.xxx`;
 
-      navigator.clipboard.writeText(msg).then(() => {
-        showToast('Đã tạo kịch bản Flash Sale xả kho vào Clipboard!', 'success');
-      });
+      document.getElementById('zalo-preview-text').value = msg;
+      document.getElementById('zalo-modal').classList.remove('hidden');
     }
 
     // Export CSV
     function exportToCsv() {
-      if (state.extractedItems.length === 0) return;
-      let csv = 'SKU,ProductName,Unit,OldPrice,NewPrice,DiffPrice,DiffPct\n';
+      if (state.extractedItems.length === 0) {
+        showToast('Chưa có dữ liệu đối soát để xuất CSV!', 'error');
+        return;
+      }
+      let csv = 'SKU,ProductName,Unit,OldPrice,NewPrice,DiffPrice,DiffPct,Confidence\n';
       state.extractedItems.forEach(i => {
-        csv += `"${i.SKU}","${i.ProductName}","${i.Unit}",${i.OldPrice},${i.NewPrice},${i.DiffPrice},"${i.DiffPct}"\n`;
+        const oldP = i.oldPrice !== undefined ? i.oldPrice : i.OldPrice;
+        const newP = i.newPrice !== undefined ? i.newPrice : i.NewPrice;
+        const diffP = newP - oldP;
+        const diffPct = oldP > 0 ? ((diffP / oldP) * 100).toFixed(2) : '0';
+        csv += `"${i.SKU}","${i.matchedProductName || i.rawProductName || i.ProductName}","${i.unit || i.Unit || 'Kg'}",${oldP},${newP},${diffP},"${diffPct}%",${i.confidence || 99}\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -1121,7 +1540,9 @@
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 tension: 0.35,
                 fill: true,
-                borderWidth: 2.5
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 6
               },
               {
                 label: 'Ribeye MB2+ (đ/Kg)',
@@ -1129,7 +1550,9 @@
                 borderColor: '#f43f5e',
                 backgroundColor: 'transparent',
                 tension: 0.35,
-                borderWidth: 2.5
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 6
               },
               {
                 label: 'Striploin MB3+ (đ/Kg)',
@@ -1137,7 +1560,19 @@
                 borderColor: '#3b82f6',
                 backgroundColor: 'transparent',
                 tension: 0.35,
-                borderWidth: 2.5
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 6
+              },
+              {
+                label: 'Ba rọi Canada (đ/Kg)',
+                data: [175000, 180000, 185000, 188000],
+                borderColor: '#f59e0b',
+                backgroundColor: 'transparent',
+                tension: 0.35,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5
               }
             ]
           },
@@ -1146,12 +1581,31 @@
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                labels: { color: textColor, font: { family: '"Plus Jakarta Sans"', size: 11, weight: 'bold' } }
+                position: 'top',
+                labels: { 
+                  color: textColor, 
+                  font: { family: '"Plus Jakarta Sans"', size: 11, weight: 'bold' },
+                  boxWidth: 12,
+                  padding: 15
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return `${ctx.dataset.label}: ${ctx.raw.toLocaleString('vi-VN')} đ`;
+                  }
+                }
               }
             },
             scales: {
               x: { grid: { color: gridColor }, ticks: { color: textColor } },
-              y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v / 1000) + 'k' } }
+              y: { 
+                grid: { color: gridColor }, 
+                ticks: { 
+                  color: textColor, 
+                  callback: v => (v / 1000) + 'k' 
+                } 
+              }
             }
           }
         });
@@ -1168,14 +1622,24 @@
             datasets: [{
               data: [45.5, 120.0, 88.5],
               backgroundColor: ['#e11d48', '#f59e0b', '#10b981'],
-              borderWidth: 0
+              borderWidth: 0,
+              hoverOffset: 4
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             cutout: '72%',
-            plugins: { legend: { display: false } }
+            plugins: { 
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return `${ctx.label}: ${ctx.raw} Kg`;
+                  }
+                }
+              }
+            }
           }
         });
       }

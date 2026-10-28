@@ -25,7 +25,7 @@
     {
       "slot": "CONVERSATION_ID_2",
       "abstract_meta_role": "DATA_TIER_AND_STORAGE_ENGINE_ARCHITECT",
-      "concrete_conversation_id": "f1c79e12-370f-4378-a5da-f18731d4b014",
+      "concrete_conversation_id": "ba0bb30a-dec1-4453-b8ad-e4547c1efedd",
       "project_assigned_id": "AI-DATABASE-RESEARCHER",
       "project_specific_title": "Database & Data Model Architect",
       "project_specific_context": "Thiết kế CSDL quan hệ MySQL hdd_appsheet, DDL, Migrations, Views cảnh báo cận date cho HDD Food.",
