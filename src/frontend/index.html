@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HDD FOOD - Hệ Thống Định Giá & Quản Trị Date Hàng (AppSheet & MySQL Sync)</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6.5.1 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981', // Emerald primary
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            },
+            beef: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+              800: '#9f1239',
+              900: '#881337',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+    .pulse-danger {
+      animation: pulseAlert 2s infinite;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- ================= TOP HEADER / STATUS BAR ================= -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 custom-shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Left: Logo & Project Brand -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+            <i class="fa-solid fa-drumstick-bite text-xl"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-black text-xl tracking-tight text-slate-900">HDD <span class="text-brand-600">FOOD</span></span>
+              <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">v3.2 Enterprise</span>
+            </div>
+            <p class="text-xs text-slate-500 font-medium hidden sm:block">Hệ thống Định giá Thịt Bò Nhập Khẩu & Quản trị Hạn Sử Dụng</p>
+          </div>
+        </div>
+
+        <!-- Center: System Status Indicators -->
+        <div class="hidden lg:flex items-center space-x-4 bg-slate-100/80 px-3 py-1.5 rounded-lg border border-slate-200/80 text-xs text-slate-600">
+          <div class="flex items-center space-x-1.5" title="Máy chủ MySQL 31.220.60.199:3306">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-medium">MySQL DB:</span>
+            <span class="font-mono text-slate-800 font-semibold">hdd_appsheet</span>
+          </div>
+          <span class="text-slate-300">|</span>
+          <div class="flex items-center space-x-1.5">
+            <i class="fa-solid fa-cloud text-sky-500 text-[11px]"></i>
+            <span>Edge Worker:</span>
+            <span class="text-emerald-600 font-semibold flex items-center">
+              Active
+            </span>
+          </div>
+          <span class="text-slate-300">|</span>
+          <div class="flex items-center space-x-1.5">
+            <i class="fa-solid fa-table-cells text-indigo-500 text-[11px]"></i>
+            <span>AppSheet Sync:</span>
+            <span class="text-brand-700 font-semibold">Realtime</span>
+          </div>
+        </div>
+
+        <!-- Right: Actions & User Role -->
+        <div class="flex items-center space-x-3">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="btnNotif" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition relative">
+              <i class="fa-regular fa-bell text-lg"></i>
+              <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
+            </button>
+          </div>
+
+          <!-- Quick Switcher Role Badge -->
+          <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+            <div class="w-9 h-9 rounded-full bg-brand-100 border border-brand-300 flex items-center justify-center text-brand-800 font-bold text-sm">
+              HD
+            </div>
+            <div class="hidden sm:block text-left">
+              <div class="text-xs font-bold text-slate-800 leading-tight">HDD Admin Portal</div>
+              <div class="text-[11px] text-slate-500" id="currentRoleLabel">Kế toán & Mua hàng</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= SUB-HEADER NAVIGATION TABS ================= -->
+  <div class="bg-white border-b border-slate-200 shadow-sm sticky top-16 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between">
+        <nav class="flex space-x-1 sm:space-x-8" aria-label="Tabs">
+          <!-- Tab 1: Kế toán & Mua hàng -->
+          <button id="tabBtnAccounting" onclick="switchMainTab('accounting')"
+            class="tab-btn active-tab flex items-center space-x-2 py-3.5 px-3 border-b-2 font-semibold text-sm transition-all border-brand-600 text-brand-700">
+            <i class="fa-solid fa-receipt text-base"></i>
+            <span>1. Kế Toán & Mua Hàng</span>
+            <span class="ml-1.5 py-0.5 px-2 rounded-full text-xs bg-brand-100 text-brand-800 font-bold">OCR & Đối Soát</span>
+          </button>
+
+          <!-- Tab 2: Kinh doanh -->
+          <button id="tabBtnSales" onclick="switchMainTab('sales')"
+            class="tab-btn flex items-center space-x-2 py-3.5 px-3 border-b-2 font-semibold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300">
+            <i class="fa-solid fa-chart-line text-base"></i>
+            <span>2. Kinh Doanh & Báo Giá</span>
+            <span class="ml-1.5 py-0.5 px-2 rounded-full text-xs bg-amber-100 text-amber-800 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> Tra cứu Realtime
+            </span>
+          </button>
+        </nav>
+
+        <!-- Right Quick Action in Navbar -->
+        <div class="hidden md:flex items-center space-x-2">
+          <button onclick="refreshMockData()" class="text-xs text-slate-500 hover:text-brand-600 px-2.5 py-1.5 rounded border border-slate-200 hover:border-brand-300 flex items-center space-x-1 bg-white">
+            <i class="fa-solid fa-arrows-rotate text-[11px]"></i>
+            <span>Đồng bộ CSDL</span>
+          </button>
+          <a href="#guideModal" onclick="openModal('guideModal')" class="text-xs text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded font-medium border border-brand-200 flex items-center space-x-1 transition">
+            <i class="fa-regular fa-circle-question"></i>
+            <span>Hướng dẫn quy trình</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ======================================================================= -->
+    <!-- PHÂN HỆ 1: KẾ TOÁN & MUA HÀNG (OCR BÓC TÁCH, ĐỐI SOÁT & DUYỆT GIÁ VỐN) -->
+    <!-- ======================================================================= -->
+    <section id="sectionAccounting" class="space-y-6">
+      
+      <!-- Top banner / summary stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-lg bg-emerald-50 text-brand-600 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Mã SKU Quản lý</div>
+            <div class="text-2xl font-bold text-slate-800" id="statTotalSkus">4 SKU</div>
+            <div class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-check"></i> Đã đồng bộ MySQL</div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Bóc tách AI (OCR)</div>
+            <div class="text-2xl font-bold text-slate-800" id="statOcrSuccess">98.5%</div>
+            <div class="text-[11px] text-sky-600 font-medium">Độ chính xác nhận diện</div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Biến động giá nhập</div>
+            <div class="text-2xl font-bold text-amber-700" id="statPriceChange">+3.65%</div>
+            <div class="text-[11px] text-amber-600 font-medium">Bình quân tháng 10/2026</div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-database"></i>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Hóa đơn chờ duyệt</div>
+            <div class="text-2xl font-bold text-purple-700" id="statPendingCount">1 Lô</div>
+            <div class="text-[11px] text-purple-600 font-medium">Cần xác nhận lưu DB</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dual-Input Panel: Zalo Text & Invoice Upload -->
+      <div class="bg-white rounded-2xl border border-slate-200 custom-shadow overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold flex items-center gap-2">
+              <i class="fa-solid fa-robot text-brand-400"></i>
+              Bóc Tách Báo Giá & Hóa Đơn Nhập Hàng (AI Inbound Parser)
+            </h2>
+            <p class="text-xs text-slate-300">Nhập tin nhắn Zalo NCC hoặc kéo thả hóa đơn đỏ VAT, phiếu giao hàng, bảng Excel</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <i class="fa-solid fa-bolt mr-1"></i> Gemini Flash OCR Ready
+            </span>
+          </div>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Column 1: Zalo Text Prompt / Raw Input (6 cols) -->
+          <div class="lg:col-span-6 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-comments text-blue-500"></i>
+                Cách 1: Dán nội dung báo giá qua Zalo / Tin nhắn
+              </label>
+              <!-- Quick sample buttons -->
+              <div class="flex items-center space-x-1">
+                <span class="text-xs text-slate-500">Nạp mẫu:</span>
+                <button type="button" onclick="loadSampleZalo('midfield')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded transition font-medium">Midfield Úc</button>
+                <button type="button" onclick="loadSampleZalo('stanbroke')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded transition font-medium">Stanbroke</button>
+                <button type="button" onclick="loadSampleZalo('excel_canada')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded transition font-medium">Ba rọi Canada</button>
+              </div>
+            </div>
+
+            <textarea id="rawZaloInput" rows="7" 
+              class="w-full text-sm font-mono p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition placeholder-slate-400"
+              placeholder="Dán tin nhắn báo giá Zalo từ Nhà Cung Cấp tại đây...
+Ví dụ:
+Báo giá lô thịt bò nhập khẩu cập nhật 26/10 từ NCC Midfield Meat:
+1. Thăn nội bò Úc Tenderloin Chilled MB2+ - Slg: 25.5kg - Đơn giá: 850.000đ/kg
+2. Thăn ngoại bò Úc Striploin MB3+ - Slg: 40.0kg - Đơn giá: 620.000đ/kg
+3. Đầu thăn ngoại Ribeye Angus MB2+ - Slg: 18.25kg - Đơn giá: 720.000đ/kg
+Số HĐ: INV-202610-104 - Giao kho Tân Bình"></textarea>
+
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span>Hỗ trợ tự động nhận diện: Tên hàng, Số lượng, Đơn vị, Đơn giá, Số Hóa Đơn.</span>
+              <button type="button" onclick="clearZaloInput()" class="text-red-500 hover:underline">Xóa trắng</button>
+            </div>
+          </div>
+
+          <!-- Column 2: Upload Files (VAT Invoice / Excel / Image) (6 cols) -->
+          <div class="lg:col-span-6 space-y-3 flex flex-col justify-between">
+            <div>
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-file-invoice text-emerald-600"></i>
+                Cách 2: Tải lên Hóa đơn VAT / Phiếu xuất kho / File Excel
+              </label>
+
+              <!-- Drag and Drop Zone -->
+              <div id="dropZone" class="border-2 border-dashed border-slate-300 hover:border-brand-500 bg-slate-50 hover:bg-brand-50/30 rounded-xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[160px] relative">
+                <input type="file" id="invoiceFileInput" class="hidden" accept=".pdf,.png,.jpg,.jpeg,.xlsx,.xls,.csv" onchange="handleFileSelect(event)">
+                <div class="w-12 h-12 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-xl mb-2">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="text-sm font-semibold text-slate-700">Kéo và thả file hóa đơn hoặc click để chọn file</div>
+                <div class="text-xs text-slate-500 mt-1">Định dạng hỗ trợ: Hóa đơn điện tử PDF, Ảnh chụp rõ nét (JPG, PNG), Excel (.xlsx)</div>
+                <div id="fileUploadStatus" class="mt-2 text-xs font-semibold text-brand-700 hidden"></div>
+              </div>
+            </div>
+
+            <!-- Meta settings: Supplier & Date -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Nhà Cung Cấp Ghi Nhận</label>
+                <select id="selectSupplier" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 outline-none">
+                  <option value="Midfield Meat Australia">Midfield Meat Australia</option>
+                  <option value="Stanbroke Australia">Stanbroke Australia</option>
+                  <option value="Teys Australia">Teys Australia</option>
+                  <option value="Excel Canada Meat">Excel Canada Meat</option>
+                  <option value="JBS Australia Pty Ltd">JBS Australia Pty Ltd</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Ngày áp dụng / Ngày hóa đơn</label>
+                <input type="date" id="inputEffectiveDate" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 outline-none" value="2026-10-28">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action Bar for Parser -->
+          <div class="lg:col-span-12 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-2 text-xs text-slate-500">
+              <i class="fa-solid fa-shield-halved text-brand-600"></i>
+              <span>Dữ liệu bóc tách được kiểm toán đối soát trước khi ghi vào bảng <code>Products</code> & <code>PriceHistory</code>.</span>
+            </div>
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+              <button type="button" onclick="runAiExtraction()" id="btnRunParser"
+                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-600/20 flex items-center justify-center space-x-2 transition active:scale-95">
+                <i class="fa-solid fa-microchip"></i>
+                <span>Chạy AI Bóc Tách & Đối Soát Báo Giá</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Result Table: Bảng bóc tách SKU, Đơn giá mới, So sánh giá cũ, Tính % biến động -->
+      <div class="bg-white rounded-2xl border border-slate-200 custom-shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h3 class="text-base font-bold text-slate-900">Bảng Đối Soát Bóc Tách SKU & Biến Động Giá Vốn</h3>
+              <span id="badgeVerificationCount" class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">4 Sản Phẩm</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Kiểm tra ánh xạ SKU chuẩn, đơn giá nhập mới so với giá vốn kỳ trước để phê duyệt vào MySQL</p>
+          </div>
+          
+          <!-- Bulk actions -->
+          <div class="flex items-center space-x-2">
+            <button onclick="addNewBlankRow()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center space-x-1 transition">
+              <i class="fa-solid fa-plus text-brand-600"></i>
+              <span>Thêm dòng thủ công</span>
+            </button>
+            <button onclick="approveAndCommitToDatabase()" id="btnApproveAll" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm flex items-center space-x-1.5 transition active:scale-95">
+              <i class="fa-solid fa-check-double"></i>
+              <span>Duyệt & Ghi Vào Database</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4">Mã SKU Chuẩn</th>
+                <th class="py-3 px-4">Tên Sản Phẩm (Gốc Hóa Đơn / Zalo)</th>
+                <th class="py-3 px-3 text-center">ĐVT</th>
+                <th class="py-3 px-3 text-right">Số Lượng Nhập</th>
+                <th class="py-3 px-4 text-right">Giá Vốn Cũ (đ)</th>
+                <th class="py-3 px-4 text-right bg-emerald-50/50">Giá Vốn Mới (đ)</th>
+                <th class="py-3 px-3 text-center">Biến Động %</th>
+                <th class="py-3 px-3 text-center">Độ Tin Cậy AI</th>
+                <th class="py-3 px-4 text-center">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="ocrTableBody" class="divide-y divide-slate-200">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Summary -->
+        <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-2">
+          <div class="flex items-center space-x-4">
+            <span><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>Trạng thái: <strong>Sẵn sàng cập nhật</strong></span>
+            <span>Tổng lượng nhập: <strong id="sumQuantity" class="text-slate-800">103.75 Kg</strong></span>
+            <span>Tổng giá trị đơn nhập: <strong id="sumTotalAmount" class="text-brand-700 text-sm">73.687.500 đ</strong></span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-slate-400">Ghi chú kế toán: Đã đối chiếu đúng mẫu hóa đơn VAT của NCC.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lịch sử ghi nhận gần nhất (PriceHistory Log Preview) -->
+      <div class="bg-white rounded-2xl border border-slate-200 custom-shadow p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-clock-rotate-left text-brand-600"></i>
+            <h4 class="text-sm font-bold text-slate-800">Nhật Ký Cập Nhật Giá Gần Đây (Bảng `PriceHistory`)</h4>
+          </div>
+          <span class="text-xs text-slate-500">Nguồn: OCR_INVOICE & ZALO_QUOTE</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="priceHistoryCards">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- PHÂN HỆ 2: KINH DOANH & BÁN HÀNG (REALTIME PRICING & CẢNH BÁO DATE)     -->
+    <!-- ======================================================================= -->
+    <section id="sectionSales" class="space-y-6 hidden">
+
+      <!-- TOP ALERT BANNER NẾU CÓ HÀNG CẬN DATE NGUY CẤP -->
+      <div id="urgentDateBanner" class="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl pulse-danger">
+            <i class="fa-solid fa-triangle-exclamation text-yellow-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-white text-red-700 font-extrabold text-[11px] tracking-wider uppercase">Cảnh Báo Cấp 1</span>
+              <h3 class="font-bold text-base sm:text-lg">Phát hiện Lô Hàng Cận Date &lt; 7 Ngày!</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-red-100 mt-0.5">
+              Lô <strong class="text-white underline">BATCH-202610-01</strong> (Chilled Tenderloin Angus MB2+) còn <strong>6 ngày</strong> sử dụng. Cần ưu tiên chào giá xả hàng ngay cho hệ thống nhà hàng Steakhouse.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 w-full md:w-auto">
+          <button onclick="scrollToExpiringSection()" class="w-full md:w-auto px-4 py-2 bg-white text-red-700 hover:bg-red-50 font-bold text-xs rounded-xl shadow transition">
+            Xem Danh Sách Cận Hạn
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick KPI Counters cho Kinh Doanh -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Khẩn Cấp (&lt; 7 Ngày)</span>
+            <span class="w-7 h-7 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">1</span>
+          </div>
+          <div class="text-2xl font-black text-red-600 mt-2">25.5 Kg</div>
+          <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-bell text-red-500"></i> Chiết khấu xả hàng: <strong>-15%</strong>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Cảnh Báo Cao (&lt; 15 Ngày)</span>
+            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">1</span>
+          </div>
+          <div class="text-2xl font-black text-amber-600 mt-2">42.0 Kg</div>
+          <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-clock text-amber-500"></i> Bò Úc Striploin Chilled MB3+
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Cận Hạn (&lt; 30 Ngày)</span>
+            <span class="w-7 h-7 rounded-full bg-emerald-100 text-brand-700 flex items-center justify-center text-xs font-bold">1</span>
+          </div>
+          <div class="text-2xl font-black text-brand-600 mt-2">18.25 Kg</div>
+          <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-calendar-check text-brand-600"></i> Ribeye Angus MB2+
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 custom-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Lợi Nhuận Mong Muốn TB</span>
+            <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">%</span>
+          </div>
+          <div class="text-2xl font-black text-indigo-600 mt-2">23.0%</div>
+          <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-chart-pie text-indigo-500"></i> Margin tự động tính giá đề xuất
+          </div>
+        </div>
+      </div>
+
+      <!-- KHỐI 1: BẢNG TRA CỨU GIÁ VỐN & GIÁ BÁN ĐỀ XUẤT REALTIME -->
+      <div class="bg-white rounded-2xl border border-slate-200 custom-shadow overflow-hidden">
+        
+        <!-- Filter Header Bar -->
+        <div class="p-5 border-b border-slate-200 bg-slate-50/70 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-tags text-brand-600"></i>
+                Bảng Báo Giá Thịt Bò Bán Ra Realtime Cho Sale
+              </h3>
+              <p class="text-xs text-slate-500">Dữ liệu lấy trực tiếp từ bảng <code>Products</code> MySQL. Cột giá đề xuất tự tính theo <code>suggested_price</code> (Generated Column).</p>
+            </div>
+            
+            <!-- Quick Copy All Quotes Button -->
+            <button onclick="copyAllSalesQuotes()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1.5 transition active:scale-95">
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy Bảng Báo Giá Gửi Zalo Khách</span>
+            </button>
+          </div>
+
+          <!-- Search & Category Filters -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <!-- Search bar -->
+            <div class="sm:col-span-5 relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="salesSearchInput" onkeyup="filterSalesProducts()"
+                placeholder="Tìm theo SKU, tên sản phẩm, quy cách cắt steak..."
+                class="w-full text-xs pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+            </div>
+
+            <!-- Category filter -->
+            <div class="sm:col-span-4">
+              <select id="salesCategoryFilter" onchange="filterSalesProducts()"
+                class="w-full text-xs p-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none">
+                <option value="ALL">Tất cả ngành hàng</option>
+                <option value="Thịt Bò Nhập Khẩu">Thịt Bò Nhập Khẩu (Chilled & Frozen)</option>
+                <option value="Cắt Steak">Quy cách Cắt Steak</option>
+                <option value="Bào Cuộn">Bào cuộn lẩu nướng</option>
+              </select>
+            </div>
+
+            <!-- Global Margin Adjustment Simulation -->
+            <div class="sm:col-span-3 flex items-center space-x-2 bg-white px-3 py-1.5 border border-slate-300 rounded-xl">
+              <label class="text-[11px] font-semibold text-slate-600 whitespace-nowrap">Mô phỏng Margin:</label>
+              <input type="range" id="globalMarginSlider" min="10" max="40" step="1" value="22" oninput="simulateGlobalMargin(this.value)" class="w-full accent-brand-600 cursor-pointer">
+              <span id="globalMarginDisplay" class="text-xs font-bold text-brand-700 w-8 text-right">22%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales Products Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4">Mã SKU</th>
+                <th class="py-3 px-4">Tên Thương Phẩm</th>
+                <th class="py-3 px-4">Quy Cách Pha Lóc / Steak</th>
+                <th class="py-3 px-4 text-right">Giá Vốn Nhập (Cost)</th>
+                <th class="py-3 px-3 text-center">Margin (%)</th>
+                <th class="py-3 px-4 text-right bg-emerald-50 text-brand-900 font-bold">Giá Đề Xuất Bán (Suggested)</th>
+                <th class="py-3 px-4 text-center">Nhà Cung Cấp</th>
+                <th class="py-3 px-3 text-center">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="salesTableBody" class="divide-y divide-slate-200">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Quick Tips for Sales Team -->
+        <div class="px-6 py-3 bg-emerald-50/60 border-t border-emerald-100 flex items-center justify-between text-xs text-brand-800">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+            <span><strong>Mẹo Sale:</strong> Nhấn nút <i class="fa-regular fa-copy text-brand-700"></i> tại từng dòng để copy nhanh thông điệp chào giá Zalo bao gồm tên, quy cách và giá bán chuẩn!</span>
+          </div>
+          <span class="text-[11px] text-slate-500">Cập nhật lần cuối: 28/10/2026 10:40</span>
+        </div>
+
+      </div>
+
+      <!-- KHỐI 2: CẢNH BÁO HÀNG CẬN DATE (< 30 NGÀY) - VIEW `ExpiringProductsWarning` -->
+      <div id="sectionExpiringBatches" class="bg-white rounded-2xl border border-slate-200 custom-shadow overflow-hidden">
+        
+        <div class="p-5 border-b border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+              <h3 class="text-base font-bold flex items-center gap-2">
+                <i class="fa-solid fa-snowflake text-sky-400"></i>
+                Bảng Cảnh Báo Lô Hàng Cận Hạn Sử Dụng (&lt; 30 Ngày)
+              </h3>
+            </div>
+            <p class="text-xs text-slate-300 mt-1">Truy vấn trực tiếp từ View MySQL <code>ExpiringProductsWarning</code> (Liên kết bảng <code>ProductBatches</code> &amp; <code>Products</code>)</p>
+          </div>
+
+          <!-- Alert Filter Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button onclick="filterExpiryWarning('ALL')" class="expiry-filter-btn active-filter px-3 py-1 rounded-lg text-xs font-semibold bg-white/20 text-white hover:bg-white/30 transition">Tất Cả</button>
+            <button onclick="filterExpiryWarning('KHAN_CAP')" class="expiry-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-red-500/30 text-red-200 hover:bg-red-500/50 transition">&lt; 7 Ngày (Đỏ)</button>
+            <button onclick="filterExpiryWarning('CAO')" class="expiry-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-amber-500/30 text-amber-200 hover:bg-amber-500/50 transition">&lt; 15 Ngày (Vàng)</button>
+            <button onclick="filterExpiryWarning('CAN_HAN')" class="expiry-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500/30 text-emerald-200 hover:bg-emerald-500/50 transition">&lt; 30 Ngày (Xanh)</button>
+          </div>
+        </div>
+
+        <!-- Table of Expiring Batches -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4">Mã Số Lô (Batch ID)</th>
+                <th class="py-3 px-4">Mã SKU</th>
+                <th class="py-3 px-4">Tên Thịt Bò / Quy Cách</th>
+                <th class="py-3 px-3 text-right">Tồn Kho (Kg)</th>
+                <th class="py-3 px-4 text-center">Hạn Dùng (Best Before)</th>
+                <th class="py-3 px-4 text-center">Số Ngày Còn Lại</th>
+                <th class="py-3 px-4 text-center">Phân Loại Cảnh Báo</th>
+                <th class="py-3 px-4 text-center">Vị Trí Kho Lạnh</th>
+                <th class="py-3 px-4 text-center">Hành Động Khẩn</th>
+              </tr>
+            </thead>
+            <tbody id="expiringTableBody" class="divide-y divide-slate-200">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+            <span>Quy chế kho HDD: Hàng cận dưới 7 ngày tự động đề xuất giảm giá xả hàng 15% - 25% hoặc chuyển sang sơ chế steak đóng gói combo.</span>
+          </div>
+          <button onclick="exportExpiringReport()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded font-semibold transition flex items-center space-x-1">
+            <i class="fa-solid fa-file-excel text-emerald-700"></i>
+            <span>Xuất Danh Sách Cận Date (Excel)</span>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-slate-700">HDD FOOD CO., LTD</span>
+        <span>&bull;</span>
+        <span>Phân Phối Thịt Bò Úc, Mỹ, Canada Cao Cấp</span>
+        <span>&bull;</span>
+        <span class="text-brand-600 font-medium">Hệ thống đồng bộ AppSheet - MySQL</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span>Phiên bản: <strong>1.0.0 (UASOF V3.2)</strong></span>
+        <span>Độ trễ API: <span class="text-emerald-600 font-mono font-bold">18ms</span></span>
+        <span>Mã hóa: <strong>AES-256 / UTF-8</strong></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL: XEM CHI TIẾT / SỬA SKU ================= -->
+  <div id="editSkuModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 relative">
+      <button onclick="closeModal('editSkuModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
+        <i class="fa-solid fa-pen-to-square text-brand-600"></i>
+        Hiệu Chỉnh Thông Tin Bóc Tách SKU
+      </h3>
+      <p class="text-xs text-slate-500 mb-4">Điều chỉnh mã SKU, quy cách pha lóc hoặc đơn giá trước khi lưu vào CSDL</p>
+
+      <form id="editSkuForm" onsubmit="saveEditedSku(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Mã SKU Chuẩn</label>
+          <select id="editModalSku" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none font-mono">
+            <option value="TP-BO-TENDER-MB2">TP-BO-TENDER-MB2 - Chilled Tenderloin Angus MB2+</option>
+            <option value="TP-BO-STRIP-MB3">TP-BO-STRIP-MB3 - Chilled Striploin Angus MB3+</option>
+            <option value="TP-BO-RIBEYE-MB2">TP-BO-RIBEYE-MB2 - Chilled Ribeye Angus MB2+</option>
+            <option value="TP-BO-BRISKET-CA">TP-BO-BRISKET-CA - Ba rọi bò Canada (Short Plate)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Hàng Gốc Bóc Tách</label>
+          <input type="text" id="editModalRawName" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Số Lượng Nhập (Kg)</label>
+            <input type="number" step="0.001" id="editModalQuantity" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Đơn Giá Mới (VNĐ/Kg)</label>
+            <input type="number" step="1000" id="editModalUnitPrice" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+          </div>
+        </div>
+
+        <div class="pt-4 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('editSkuModal')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50">Hủy</button>
+          <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow">Cập Nhật</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: HƯỚNG DẪN QUY TRÌNH ================= -->
+  <div id="guideModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('guideModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-book-open-reader text-brand-600"></i>
+        Hướng Dẫn Vận Hành Hệ Thống HDD Food Mini Web App
+      </h3>
+
+      <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
+        <div class="p-3 bg-brand-50 rounded-xl border border-brand-200">
+          <h4 class="font-bold text-brand-800 text-sm mb-1">1. Phân hệ Kế toán & Mua hàng</h4>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Dán trực tiếp văn bản báo giá từ ứng dụng Zalo của nhà cung cấp hoặc kéo thả ảnh chụp hóa đơn đỏ/PDF.</li>
+            <li>Bấm <strong>"Chạy AI Bóc Tách"</strong> để hệ thống tự động bóc tách từng mặt hàng, quy cách và đơn giá.</li>
+            <li>Hệ thống tự động so khớp giá mới với bảng <code>Products.cost_price</code> hiện tại, tính ra % biến động tăng/giảm.</li>
+            <li>Kế toán bấm <strong>"Duyệt & Ghi Vào Database"</strong>: Dữ liệu được ghi vào <code>PriceHistory</code> và cập nhật giá vốn mới vào <code>Products</code>, đồng bộ ngay lập tức tới AppSheet.</li>
+          </ul>
+        </div>
+
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+          <h4 class="font-bold text-amber-800 text-sm mb-1">2. Phân hệ Kinh doanh & Tra cứu Giá Realtime</h4>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Kinh doanh tra cứu tức thời giá vốn mới nhất mà Kế toán vừa duyệt.</li>
+            <li>Giá bán đề xuất tự động tính toán dựa theo % Lợi nhuận mong muốn (Margin) cài đặt trong hệ thống.</li>
+            <li>Nhấn icon <strong>Copy Báo Giá</strong> để dán nhanh gửi khách VIP trên Zalo với đầy đủ thông tin chuẩn hóa.</li>
+            <li>Theo dõi bảng <strong>"Cảnh Báo Hàng Cận Date"</strong>: các lô dưới 7 ngày (nhãn đỏ), dưới 15 ngày (nhãn vàng) để ưu tiên sale xả hàng tránh hủy hỏng.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-4 mt-2 border-t border-slate-200 flex justify-end">
+        <button onclick="closeModal('guideModal')" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold">Đã Hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // --- 1. DỮ LIỆU BAN ĐẦU CHUẨN TỪ SCHEMA MYSQL ---
+    let productsDb = [
+      {
+        SKU: "TP-BO-TENDER-MB2",
+        ProductName: "Chilled Tenderloin Angus MB2+",
+        Category: "Thịt Bò Nhập Khẩu",
+        CuttingSpec: "Cắt Steak 200g - 250g",
+        Unit: "Kg",
+        cost_price: 850000.00,
+        previous_cost_price: 820000.00,
+        DesiredMarginPct: 25.00,
+        latest_supplier: "Midfield Meat Australia",
+        last_purchase_date: "2026-10-20"
+      },
+      {
+        SKU: "TP-BO-STRIP-MB3",
+        ProductName: "Chilled Striploin Angus MB3+",
+        Category: "Thịt Bò Nhập Khẩu",
+        CuttingSpec: "Cắt Steak 250g",
+        Unit: "Kg",
+        cost_price: 620000.00,
+        previous_cost_price: 600000.00,
+        DesiredMarginPct: 22.00,
+        latest_supplier: "Stanbroke Australia",
+        last_purchase_date: "2026-10-22"
+      },
+      {
+        SKU: "TP-BO-RIBEYE-MB2",
+        ProductName: "Chilled Ribeye Angus MB2+",
+        Category: "Thịt Bò Nhập Khẩu",
+        CuttingSpec: "Cắt Steak 300g dày 2cm",
+        Unit: "Kg",
+        cost_price: 720000.00,
+        previous_cost_price: 710000.00,
+        DesiredMarginPct: 25.00,
+        latest_supplier: "Teys Australia",
+        last_purchase_date: "2026-10-24"
+      },
+      {
+        SKU: "TP-BO-BRISKET-CA",
+        ProductName: "Ba rọi bò Canada (Short Plate)",
+        Category: "Thịt Bò Nhập Khẩu",
+        CuttingSpec: "Bào cuộn lẩu / nướng 1.5mm",
+        Unit: "Kg",
+        cost_price: 185000.00,
+        previous_cost_price: 180000.00,
+        DesiredMarginPct: 20.00,
+        latest_supplier: "Excel Canada Meat",
+        last_purchase_date: "2026-10-25"
+      }
+    ];
+
+    // Dữ liệu bóc tách hóa đơn / Zalo hiện tại chờ duyệt (InboundReceiptOCR)
+    let pendingOcrItems = [
+      {
+        id: "ocr-1",
+        SKU: "TP-BO-TENDER-MB2",
+        rawProductName: "Thăn nội bò Úc Chilled Tenderloin MB2+",
+        quantity: 25.5,
+        unit: "Kg",
+        oldPrice: 820000,
+        newPrice: 850000,
+        confidence: 99.2,
+        status: "PENDING_CONFIRMATION"
+      },
+      {
+        id: "ocr-2",
+        SKU: "TP-BO-STRIP-MB3",
+        rawProductName: "Thăn ngoại bò Úc Striploin MB3+ Stanbroke",
+        quantity: 40.0,
+        unit: "Kg",
+        oldPrice: 600000,
+        newPrice: 620000,
+        confidence: 98.7,
+        status: "PENDING_CONFIRMATION"
+      },
+      {
+        id: "ocr-3",
+        SKU: "TP-BO-RIBEYE-MB2",
+        rawProductName: "Đầu thăn ngoại Ribeye Angus Teys MB2+",
+        quantity: 18.25,
+        unit: "Kg",
+        oldPrice: 710000,
+        newPrice: 720000,
+        confidence: 97.8,
+        status: "PENDING_CONFIRMATION"
+      },
+      {
+        id: "ocr-4",
+        SKU: "TP-BO-BRISKET-CA",
+        rawProductName: "Ba rọi bò Canada Short Plate đông lạnh",
+        quantity: 20.0,
+        unit: "Kg",
+        oldPrice: 180000,
+        newPrice: 185000,
+        confidence: 99.5,
+        status: "PENDING_CONFIRMATION"
+      }
+    ];
+
+    // View Cảnh báo hàng cận date (ExpiringProductsWarning)
+    let expiringBatches = [
+      {
+        BatchNumber: "BATCH-202610-01",
+        SKU: "TP-BO-TENDER-MB2",
+        ProductName: "Chilled Tenderloin Angus MB2+",
+        StockQuantity: 25.5,
+        ExpiryDate: "2026-11-03", // 6 ngày nữa
+        DaysRemaining: 6,
+        WarningAlert: "KHẨN CẤP (< 7 NGÀY)",
+        WarehouseLocation: "Kho Lạnh Âm 2 - 4C"
+      },
+      {
+        BatchNumber: "BATCH-202610-02",
+        SKU: "TP-BO-STRIP-MB3",
+        ProductName: "Chilled Striploin Angus MB3+",
+        StockQuantity: 42.0,
+        ExpiryDate: "2026-11-11", // 14 ngày nữa
+        DaysRemaining: 14,
+        WarningAlert: "CẢNH BÁO CAO (< 15 NGÀY)",
+        WarehouseLocation: "Kho Lạnh Âm 2 - 4C"
+      },
+      {
+        BatchNumber: "BATCH-202610-03",
+        SKU: "TP-BO-RIBEYE-MB2",
+        ProductName: "Chilled Ribeye Angus MB2+",
+        StockQuantity: 18.25,
+        ExpiryDate: "2026-11-25", // 28 ngày nữa
+        DaysRemaining: 28,
+        WarningAlert: "CẬN HẠN (< 30 NGÀY)",
+        WarehouseLocation: "Kho Lạnh Âm 2 - 4C"
+      }
+    ];
+
+    // Lịch sử biến động giá PriceHistory
+    let priceHistoryData = [
+      {
+        SKU: "TP-BO-TENDER-MB2",
+        UnitPrice: 850000,
+        SupplierName: "Midfield Meat Australia",
+        ReceiptRef: "INV-202610-104",
+        EffectiveDate: "2026-10-20",
+        SourceType: "OCR_INVOICE"
+      },
+      {
+        SKU: "TP-BO-STRIP-MB3",
+        UnitPrice: 620000,
+        SupplierName: "Stanbroke Australia",
+        ReceiptRef: "ZALO-STAN-99",
+        EffectiveDate: "2026-10-22",
+        SourceType: "ZALO_QUOTE"
+      },
+      {
+        SKU: "TP-BO-BRISKET-CA",
+        UnitPrice: 185000,
+        SupplierName: "Excel Canada Meat",
+        ReceiptRef: "INV-CAN-3312",
+        EffectiveDate: "2026-10-25",
+        SourceType: "MANUAL_EXCEL"
+      }
+    ];
+
+    let currentEditingIndex = null;
+
+    // --- 2. HÀM ĐỊNH DẠNG SỐ & TIỀN TỆ ---
+    function formatMoney(amount) {
+      if (isNaN(amount) || amount === null) return "0 đ";
+      return new Intl.NumberFormat('vi-VN').format(Math.round(amount)) + " đ";
+    }
+
+    function formatNumber(num, decimals = 2) {
+      if (isNaN(num) || num === null) return "0";
+      return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: decimals }).format(num);
+    }
+
+    // --- 3. ĐIỀU HƯỚNG TABS ---
+    function switchMainTab(tab) {
+      const tabAccounting = document.getElementById('tabBtnAccounting');
+      const tabSales = document.getElementById('tabBtnSales');
+      const secAccounting = document.getElementById('sectionAccounting');
+      const secSales = document.getElementById('sectionSales');
+      const roleLabel = document.getElementById('currentRoleLabel');
+
+      if (tab === 'accounting') {
+        tabAccounting.className = "tab-btn active-tab flex items-center space-x-2 py-3.5 px-3 border-b-2 font-semibold text-sm transition-all border-brand-600 text-brand-700";
+        tabSales.className = "tab-btn flex items-center space-x-2 py-3.5 px-3 border-b-2 font-semibold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300";
+        secAccounting.classList.remove('hidden');
+        secSales.classList.add('hidden');
+        roleLabel.innerText = "Kế toán & Mua hàng";
+      } else {
+        tabSales.className = "tab-btn active-tab flex items-center space-x-2 py-3.5 px-3 border-b-2 font-semibold text-sm transition-all border-brand-600 text-brand-700";
+        tabAccounting.className = "tab-btn flex items-center space-x-2 py-3.5 px-3 border-b-2 font-semibold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300";
+        secAccounting.classList.add('hidden');
+        secSales.classList.remove('hidden');
+        roleLabel.innerText = "Kinh doanh & Báo giá";
+        renderSalesTable();
+        renderExpiringTable();
+      }
+    }
+
+    // --- 4. RENDER BẢNG BÓC TÁCH KẾ TOÁN (OCR TABLE) ---
+    function renderOcrTable() {
+      const tbody = document.getElementById('ocrTableBody');
+      tbody.innerHTML = '';
+
+      let totalQty = 0;
+      let totalAmount = 0;
+
+      pendingOcrItems.forEach((item, index) => {
+        totalQty += parseFloat(item.quantity) || 0;
+        totalAmount += (parseFloat(item.quantity) || 0) * (parseFloat(item.newPrice) || 0);
+
+        const diffPrice = item.newPrice - item.oldPrice;
+        const pct = item.oldPrice > 0 ? ((diffPrice / item.oldPrice) * 100).toFixed(2) : 0;
+
+        let diffBadge = '';
+        if (diffPrice > 0) {
+          diffBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">
+            <i class="fa-solid fa-arrow-up mr-1 text-[10px]"></i>+${pct}%
+          </span>`;
+        } else if (diffPrice < 0) {
+          diffBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-brand-700">
+            <i class="fa-solid fa-arrow-down mr-1 text-[10px]"></i>${pct}%
+          </span>`;
+        } else {
+          diffBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">0.0%</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-slate-800 flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full ${item.status === 'COMMITTED' ? 'bg-emerald-500' : 'bg-amber-400'}"></span>
+            <span>${item.SKU}</span>
+          </td>
+          <td class="py-3 px-4">
+            <div class="font-medium text-slate-800">${item.rawProductName}</div>
+            <div class="text-[11px] text-slate-400">Map chuẩn: ${getProductNameBySku(item.SKU)}</div>
+          </td>
+          <td class="py-3 px-3 text-center text-slate-500">${item.unit}</td>
+          <td class="py-3 px-3 text-right font-mono font-semibold text-slate-700">${formatNumber(item.quantity, 2)}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-400 line-through">${formatMoney(item.oldPrice)}</td>
+          <td class="py-3 px-4 text-right font-mono font-bold text-slate-900 bg-emerald-50/40">${formatMoney(item.newPrice)}</td>
+          <td class="py-3 px-3 text-center">${diffBadge}</td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+              ${item.confidence}%
+            </span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center space-x-2">
+              <button onclick="openEditModal(${index})" class="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition" title="Hiệu chỉnh dòng">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button onclick="removeOcrRow(${index})" class="p-1.5 rounded hover:bg-red-50 text-red-500 transition" title="Xóa bỏ">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update Summary Info
+      document.getElementById('badgeVerificationCount').innerText = `${pendingOcrItems.length} Sản Phẩm`;
+      document.getElementById('sumQuantity').innerText = `${formatNumber(totalQty, 2)} Kg`;
+      document.getElementById('sumTotalAmount').innerText = formatMoney(totalAmount);
+    }
+
+    function getProductNameBySku(sku) {
+      const p = productsDb.find(item => item.SKU === sku);
+      return p ? p.ProductName : "Chưa xác định";
+    }
+
+    function removeOcrRow(index) {
+      pendingOcrItems.splice(index, 1);
+      renderOcrTable();
+      showToast("Đã xóa dòng bóc tách", "info");
+    }
+
+    function addNewBlankRow() {
+      pendingOcrItems.push({
+        id: "ocr-" + Date.now(),
+        SKU: "TP-BO-TENDER-MB2",
+        rawProductName: "Sản phẩm mới nhập từ hóa đơn",
+        quantity: 10.0,
+        unit: "Kg",
+        oldPrice: 820000,
+        newPrice: 830000,
+        confidence: 100.0,
+        status: "PENDING_CONFIRMATION"
+      });
+      renderOcrTable();
+      showToast("Đã thêm dòng mới. Vui lòng cập nhật thông tin!", "info");
+    }
+
+    // --- 5. NẠP MẪU ZALO & AI BÓC TÁCH MÔ PHỎNG ---
+    function loadSampleZalo(sampleType) {
+      const textarea = document.getElementById('rawZaloInput');
+      const supplierSelect = document.getElementById('selectSupplier');
+
+      if (sampleType === 'midfield') {
+        textarea.value = `[Zalo Midfield Meat Australia - 28/10/2026]
+Dạ em gửi bên HDD Food bảng giá thịt bò nhập khẩu Chilled hàng air mới về:
+1. Chilled Tenderloin Angus MB2+ (Thăn nội bò Úc) - SL: 25.5 kg - Giá: 850.000 đ/kg
+2. Chilled Striploin Angus MB3+ (Thăn ngoại bò Úc) - SL: 40.0 kg - Giá: 620.000 đ/kg
+Số lô: BATCH-202610-01 - Hóa đơn VAT: INV-202610-104. Giao kho lạnh Tân Bình.`;
+        supplierSelect.value = "Midfield Meat Australia";
+      } else if (sampleType === 'stanbroke') {
+        textarea.value = `[Báo giá Stanbroke Australia]
+Chào anh/chị kế toán HDD Food, bên em cập nhật giá lô thăn ngoại & ribeye:
+- Thăn ngoại Chilled Striploin MB3+: số lượng 35kg, giá chốt 615.000 đ/kg.
+- Đầu thăn ngoại Chilled Ribeye MB2+: số lượng 20kg, giá chốt 718.000 đ/kg.
+Chứng từ kèm theo: PO-STAN-20261028.`;
+        supplierSelect.value = "Stanbroke Australia";
+      } else if (sampleType === 'excel_canada') {
+        textarea.value = `Báo giá Ba Rọi Bò Canada - Công ty TNHH Excel Canada Meat:
+- Ba rọi bò Canada (Short Plate) bào cuộn lẩu: 150 kg, đơn giá 188.000 đ/kg.
+Hạn dùng 12 tháng, date mới 10/2026. Hóa đơn số 004521.`;
+        supplierSelect.value = "Excel Canada Meat";
+      }
+      showToast("Đã nạp văn bản Zalo mẫu!", "info");
+    }
+
+    function clearZaloInput() {
+      document.getElementById('rawZaloInput').value = '';
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const statusDiv = document.getElementById('fileUploadStatus');
+        statusDiv.classList.remove('hidden');
+        statusDiv.innerHTML = `<i class="fa-solid fa-file-circle-check"></i> Đã chọn file: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+        showToast(`Đã nhận file ${file.name}. Sẵn sàng bóc tách OCR!`, "success");
+      }
+    }
+
+    function runAiExtraction() {
+      const btn = document.getElementById('btnRunParser');
+      const originalText = btn.innerHTML;
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>AI Đang Phân Tích & OCR (2.5s)...</span>`;
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+
+        // Mô phỏng cập nhật bảng với dữ liệu OCR chuẩn hóa
+        pendingOcrItems = [
+          {
+            id: "ocr-1",
+            SKU: "TP-BO-TENDER-MB2",
+            rawProductName: "Thăn nội bò Úc Chilled Tenderloin MB2+",
+            quantity: 25.5,
+            unit: "Kg",
+            oldPrice: 820000,
+            newPrice: 850000,
+            confidence: 99.4,
+            status: "PENDING_CONFIRMATION"
+          },
+          {
+            id: "ocr-2",
+            SKU: "TP-BO-STRIP-MB3",
+            rawProductName: "Thăn ngoại bò Úc Striploin MB3+ Stanbroke",
+            quantity: 40.0,
+            unit: "Kg",
+            oldPrice: 600000,
+            newPrice: 620000,
+            confidence: 98.9,
+            status: "PENDING_CONFIRMATION"
+          },
+          {
+            id: "ocr-3",
+            SKU: "TP-BO-RIBEYE-MB2",
+            rawProductName: "Đầu thăn ngoại Ribeye Angus Teys MB2+",
+            quantity: 18.25,
+            unit: "Kg",
+            oldPrice: 710000,
+            newPrice: 720000,
+            confidence: 97.6,
+            status: "PENDING_CONFIRMATION"
+          },
+          {
+            id: "ocr-4",
+            SKU: "TP-BO-BRISKET-CA",
+            rawProductName: "Ba rọi bò Canada Short Plate lẩu nướng",
+            quantity: 20.0,
+            unit: "Kg",
+            oldPrice: 180000,
+            newPrice: 185000,
+            confidence: 99.1,
+            status: "PENDING_CONFIRMATION"
+          }
+        ];
+
+        renderOcrTable();
+        showToast("Bóc tách AI hoàn tất thành công! Đã so sánh với giá vốn cũ.", "success");
+      }, 1500);
+    }
+
+    // --- 6. DUYỆT & GHI VÀO CSDL MYSQL ---
+    function approveAndCommitToDatabase() {
+      const btn = document.getElementById('btnApproveAll');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Ghi MySQL hdd_appsheet...`;
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-check-double"></i><span>Duyệt & Ghi Vào Database</span>`;
+
+        // Cập nhật giá vốn mới vào DB giả lập Products
+        pendingOcrItems.forEach(item => {
+          const prod = productsDb.find(p => p.SKU === item.SKU);
+          if (prod) {
+            prod.previous_cost_price = prod.cost_price;
+            prod.cost_price = item.newPrice;
+            prod.last_purchase_date = document.getElementById('inputEffectiveDate').value;
+            prod.latest_supplier = document.getElementById('selectSupplier').value;
+          }
+
+          // Ghi vào PriceHistory
+          priceHistoryData.unshift({
+            SKU: item.SKU,
+            UnitPrice: item.newPrice,
+            SupplierName: document.getElementById('selectSupplier').value,
+            ReceiptRef: "INV-202610-104",
+            EffectiveDate: document.getElementById('inputEffectiveDate').value,
+            SourceType: "OCR_INVOICE"
+          });
+
+          item.status = "COMMITTED";
+        });
+
+        renderOcrTable();
+        renderPriceHistoryCards();
+        renderSalesTable();
+
+        showToast("Đã duyệt thành công và đồng bộ vào CSDL MySQL (Bảng Products & PriceHistory)!", "success");
+      }, 1200);
+    }
+
+    function renderPriceHistoryCards() {
+      const container = document.getElementById('priceHistoryCards');
+      container.innerHTML = '';
+
+      priceHistoryData.slice(0, 3).forEach(hist => {
+        const prod = productsDb.find(p => p.SKU === hist.SKU);
+        const card = document.createElement('div');
+        card.className = "p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="font-mono font-bold text-xs text-brand-700">${hist.SKU}</div>
+            <div class="text-xs font-semibold text-slate-800">${prod ? prod.ProductName : hist.SKU}</div>
+            <div class="text-[11px] text-slate-500 mt-1">NCC: ${hist.SupplierName} &bull; Ngày: ${hist.EffectiveDate}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-mono font-bold text-xs text-slate-900">${formatMoney(hist.UnitPrice)}</div>
+            <span class="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 uppercase">${hist.SourceType}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // --- 7. PHÂN HỆ KINH DOANH: RENDER BẢNG GIÁ REALTIME ---
+    function renderSalesTable(filteredList = null) {
+      const tbody = document.getElementById('salesTableBody');
+      tbody.innerHTML = '';
+
+      const list = filteredList || productsDb;
+
+      list.forEach(p => {
+        // Công thức tính giá bán đề xuất trong MySQL:
+        // suggested_price = ROUND(cost_price * (1 + DesiredMarginPct / 100), 0)
+        const suggestedPrice = Math.round(p.cost_price * (1 + (p.DesiredMarginPct / 100)));
+        const profitPerKg = suggestedPrice - p.cost_price;
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-brand-700">${p.SKU}</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-slate-800">${p.ProductName}</div>
+            <div class="text-[11px] text-slate-400">Ngành hàng: ${p.Category} &bull; Cập nhật: ${p.last_purchase_date || 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4 text-slate-600 font-medium">${p.CuttingSpec}</td>
+          <td class="py-3 px-4 text-right font-mono font-bold text-slate-700">${formatMoney(p.cost_price)}</td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              ${p.DesiredMarginPct}%
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right font-mono font-extrabold text-brand-800 bg-emerald-50/70 text-sm">
+            ${formatMoney(suggestedPrice)}
+            <div class="text-[10px] text-brand-600 font-normal">Lãi: +${formatMoney(profitPerKg)}/Kg</div>
+          </td>
+          <td class="py-3 px-4 text-center text-slate-600">${p.latest_supplier}</td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="copySingleSalesQuote('${p.SKU}')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 font-semibold text-xs transition flex items-center justify-center space-x-1 mx-auto" title="Copy báo giá cho khách Zalo">
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy</span>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterSalesProducts() {
+      const query = document.getElementById('salesSearchInput').value.toLowerCase().trim();
+      const cat = document.getElementById('salesCategoryFilter').value;
+
+      const filtered = productsDb.filter(p => {
+        const matchesQuery = p.SKU.toLowerCase().includes(query) ||
+                             p.ProductName.toLowerCase().includes(query) ||
+                             p.CuttingSpec.toLowerCase().includes(query);
+
+        let matchesCat = true;
+        if (cat === "Thịt Bò Nhập Khẩu") matchesCat = p.Category === "Thịt Bò Nhập Khẩu";
+        else if (cat === "Cắt Steak") matchesCat = p.CuttingSpec.toLowerCase().includes("steak");
+        else if (cat === "Bào Cuộn") matchesCat = p.CuttingSpec.toLowerCase().includes("cuộn");
+
+        return matchesQuery && matchesCat;
+      });
+
+      renderSalesTable(filtered);
+    }
+
+    function simulateGlobalMargin(val) {
+      document.getElementById('globalMarginDisplay').innerText = val + "%";
+      productsDb.forEach(p => {
+        p.DesiredMarginPct = parseFloat(val);
+      });
+      renderSalesTable();
+    }
+
+    function copySingleSalesQuote(sku) {
+      const p = productsDb.find(item => item.SKU === sku);
+      if (!p) return;
+
+      const suggestedPrice = Math.round(p.cost_price * (1 + (p.DesiredMarginPct / 100)));
+      const textToCopy = `🥩 [HDD FOOD - BÁO GIÁ THỊT BÒ NHẬP KHẨU]
+🔹 Sản phẩm: ${p.ProductName}
+🔹 Mã hàng: ${p.SKU}
+🔹 Quy cách: ${p.CuttingSpec}
+👉 Giá bán đề xuất: ${formatMoney(suggestedPrice)}/${p.Unit}
+(Cam kết hàng chuẩn xuất xứ ${p.latest_supplier}, có CO/CQ & VSATTP)`;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast(`Đã sao chép báo giá [${p.ProductName}] vào Clipboard!`, "success");
+      });
+    }
+
+    function copyAllSalesQuotes() {
+      let quoteText = `🥩🥩 [BẢNG BÁO GIÁ THỊT BÒ NHẬP KHẨU CAO CẤP - HDD FOOD] 🥩🥩\nNgày áp dụng: 28/10/2026\n---------------------------------------\n`;
+
+      productsDb.forEach((p, idx) => {
+        const suggested = Math.round(p.cost_price * (1 + (p.DesiredMarginPct / 100)));
+        quoteText += `${idx + 1}. ${p.ProductName} (${p.CuttingSpec})\n   👉 Đơn giá: ${formatMoney(suggested)}/${p.Unit}\n`;
+      });
+
+      quoteText += `---------------------------------------\n📞 Liên hệ Sales HDD Food: 0988.xxx.xxx để nhận chiết khấu sỉ theo lô!`;
+
+      navigator.clipboard.writeText(quoteText).then(() => {
+        showToast("Đã copy toàn bộ bảng giá gửi Zalo khách hàng!", "success");
+      });
+    }
+
+    // --- 8. PHÂN HỆ KINH DOANH: BẢNG CẢNH BÁO DATE (< 30 NGÀY) ---
+    function renderExpiringTable(filteredAlert = 'ALL') {
+      const tbody = document.getElementById('expiringTableBody');
+      tbody.innerHTML = '';
+
+      let list = expiringBatches;
+      if (filteredAlert === 'KHAN_CAP') {
+        list = expiringBatches.filter(b => b.DaysRemaining <= 7);
+      } else if (filteredAlert === 'CAO') {
+        list = expiringBatches.filter(b => b.DaysRemaining > 7 && b.DaysRemaining <= 15);
+      } else if (filteredAlert === 'CAN_HAN') {
+        list = expiringBatches.filter(b => b.DaysRemaining > 15 && b.DaysRemaining <= 30);
+      }
+
+      list.forEach(batch => {
+        let alertBadge = '';
+        let rowClass = 'hover:bg-slate-50';
+
+        if (batch.DaysRemaining <= 7) {
+          alertBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-red-100 text-red-700 border border-red-300 animate-pulse">
+            <i class="fa-solid fa-fire mr-1 text-red-600"></i> ${batch.WarningAlert}
+          </span>`;
+          rowClass = 'bg-red-50/40 hover:bg-red-50';
+        } else if (batch.DaysRemaining <= 15) {
+          alertBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+            <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> ${batch.WarningAlert}
+          </span>`;
+        } else {
+          alertBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-brand-800 border border-brand-300">
+            <i class="fa-solid fa-clock mr-1 text-brand-600"></i> ${batch.WarningAlert}
+          </span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = `${rowClass} transition border-b border-slate-100`;
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-slate-800">${batch.BatchNumber}</td>
+          <td class="py-3 px-4 font-mono text-slate-600">${batch.SKU}</td>
+          <td class="py-3 px-4 font-semibold text-slate-900">${batch.ProductName}</td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-slate-800">${formatNumber(batch.StockQuantity, 2)}</td>
+          <td class="py-3 px-4 text-center font-mono font-semibold text-slate-700">${batch.ExpiryDate}</td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center space-x-2">
+              <span class="font-extrabold text-sm ${batch.DaysRemaining <= 7 ? 'text-red-600' : batch.DaysRemaining <= 15 ? 'text-amber-600' : 'text-brand-600'}">
+                ${batch.DaysRemaining} ngày
+              </span>
+            </div>
+          </td>
+          <td class="py-3 px-4 text-center">${alertBadge}</td>
+          <td class="py-3 px-4 text-center text-slate-600 font-medium">${batch.WarehouseLocation}</td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="createFlashSalePrompt('${batch.BatchNumber}', '${batch.ProductName}', ${batch.StockQuantity})" class="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition active:scale-95 flex items-center space-x-1 mx-auto">
+              <i class="fa-solid fa-bolt"></i>
+              <span>Flash Sale Xả Hàng</span>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterExpiryWarning(type) {
+      document.querySelectorAll('.expiry-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-slate-900');
+        btn.classList.add('bg-white/20', 'text-white');
+      });
+      renderExpiringTable(type);
+    }
+
+    function scrollToExpiringSection() {
+      const el = document.getElementById('sectionExpiringBatches');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function createFlashSalePrompt(batchNo, prodName, qty) {
+      const promptText = `🔥 [FLASH SALE XẢ HÀNG CẬN DATE - HDD FOOD] 🔥
+💥 Lô hàng: ${batchNo}
+🥩 Sản phẩm: ${prodName}
+📦 Số lượng ưu đãi đặc biệt: ${qty} Kg
+🏷️ Giảm ngay 20% cho đơn hàng chốt trước 17h hôm nay!
+Liên hệ hotline đặt giữ hàng: 0988.xxx.xxx`;
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        showToast(`Đã tạo mẫu Flash Sale cho lô [${batchNo}] và copy vào bộ nhớ tạm!`, "success");
+      });
+    }
+
+    function exportExpiringReport() {
+      showToast("Đang xuất file Excel danh sách cận hạn sử dụng...", "info");
+      setTimeout(() => {
+        showToast("Đã tải về file: Bao_Cao_Can_Date_HDD_Food_20261028.xlsx", "success");
+      }, 1000);
+    }
+
+    // --- 9. MODAL CHỈNH SỬA SKU BÓC TÁCH ---
+    function openEditModal(index) {
+      currentEditingIndex = index;
+      const item = pendingOcrItems[index];
+
+      document.getElementById('editModalSku').value = item.SKU;
+      document.getElementById('editModalRawName').value = item.rawProductName;
+      document.getElementById('editModalQuantity').value = item.quantity;
+      document.getElementById('editModalUnitPrice').value = item.newPrice;
+
+      openModal('editSkuModal');
+    }
+
+    function saveEditedSku(e) {
+      e.preventDefault();
+      if (currentEditingIndex === null) return;
+
+      const item = pendingOcrItems[currentEditingIndex];
+      item.SKU = document.getElementById('editModalSku').value;
+      item.rawProductName = document.getElementById('editModalRawName').value;
+      item.quantity = parseFloat(document.getElementById('editModalQuantity').value) || 0;
+      item.newPrice = parseFloat(document.getElementById('editModalUnitPrice').value) || 0;
+
+      // Cập nhật lại giá cũ tương ứng với SKU mới nếu đổi SKU
+      const matchedProd = productsDb.find(p => p.SKU === item.SKU);
+      if (matchedProd) {
+        item.oldPrice = matchedProd.cost_price;
+      }
+
+      closeModal('editSkuModal');
+      renderOcrTable();
+      showToast("Đã cập nhật thông tin dòng bóc tách!", "success");
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // --- 10. TOAST NOTIFICATION UTILITY ---
+    function showToast(message, type = "success") {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+
+      let icon = 'fa-check-circle text-emerald-500';
+      let border = 'border-emerald-200';
+      if (type === 'error') {
+        icon = 'fa-circle-xmark text-red-500';
+        border = 'border-red-200';
+      } else if (type === 'info') {
+        icon = 'fa-circle-info text-sky-500';
+        border = 'border-sky-200';
+      }
+
+      toast.className = `p-3.5 bg-white border ${border} rounded-xl shadow-xl flex items-center space-x-3 text-xs font-semibold text-slate-800 transition-all duration-300 transform translate-y-2 pointer-events-auto`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base"></i>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function refreshMockData() {
+      showToast("Đang đồng bộ dữ liệu mới nhất từ MySQL hdd_appsheet...", "info");
+      setTimeout(() => {
+        renderOcrTable();
+        renderPriceHistoryCards();
+        renderSalesTable();
+        renderExpiringTable();
+        showToast("Đã đồng bộ hoàn tất (4 SKU, 3 Lô hàng, Lịch sử đầy đủ)!", "success");
+      }, 800);
+    }
+
+    // --- 11. KHỞI TẠO LẦN ĐẦU ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderOcrTable();
+      renderPriceHistoryCards();
+      renderSalesTable();
+      renderExpiringTable();
+    });
+  </script>
+</body>
+</html>
