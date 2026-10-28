@@ -1,0 +1,28 @@
+{
+  "name": "hdd-food-pricing-system",
+  "version": "1.0.0",
+  "description": "HDD Food - Pricing & Expiration Management System (Backend Express & Web App)",
+  "main": "src/backend/server.js",
+  "scripts": {
+    "start": "node src/backend/server.js",
+    "dev": "node --watch src/backend/server.js",
+    "test": "node src/backend/test-api.js"
+  },
+  "keywords": [
+    "food",
+    "pricing",
+    "ocr",
+    "express",
+    "mysql",
+    "appsheet"
+  ],
+  "author": "Fullstack Developer (Swarm Agent)",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "multer": "^1.4.5-lts.2",
+    "mysql2": "^3.24.6"
+  }
+}
