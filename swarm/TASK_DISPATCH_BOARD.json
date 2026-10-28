@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "project_name": "ai-swarm-project",
   "active_sprint": "SPRINT_1_DESIGN_AND_FULLSTACK_DEVELOPMENT",
-  "last_updated": "2026-10-28T10:45:00+07:00",
+  "last_updated": "2026-10-28T10:56:00+07:00",
   "tasks": [
     {
       "task_id": "TASK-DATA-001",
@@ -32,17 +32,18 @@
       "assigned_conversation_id": "d97fa2d3-8aac-40c6-b843-736c2e12f5ea",
       "status": "COMPLETED",
       "description": "Đã lập trình trọn bộ Express Backend (src/backend/server.js, db.js, parser.js, test-api.js), phục vụ static frontend, 25/25 automated tests pass, commit eeb0a0d.",
-      "handoff_to": "AI-AUDIT",
-      "next_action": "Bàn giao cho AI-AUDIT tiến hành kiểm toán 5 Quality Gates."
+      "handoff_to": "AI-AUDIT"
     },
     {
       "task_id": "TASK-AUDIT-001",
       "module": "QUALITY_ASSURANCE",
       "title": "Kiểm toán 5 Quality Gates, bảo mật và thẩm định chạy thử nghiệm thu",
       "assigned_to": "AI-AUDIT",
-      "status": "WAITING_FOR_PREREQUISITE",
-      "description": "Kiểm toán trọn gói hệ thống, cấp chứng chỉ nghiệm thu QA_AUDIT_REPORT.md.",
-      "handoff_to": "AI-LEAD"
+      "assigned_conversation_id": "e645e68e-933f-4336-9aa3-87ca6a1243fb",
+      "status": "IN_PROGRESS",
+      "description": "Kiểm toán trọn gói hệ thống, chạy kiểm thử 25 test cases, cấp chứng chỉ nghiệm thu docs/QA_AUDIT_REPORT.md.",
+      "handoff_to": "AI-LEAD",
+      "next_action": "AI-AUDIT hoàn tất báo cáo kiểm toán và bàn giao chứng chỉ nghiệm thu về cho AI-LEAD&BA."
     }
   ]
 }
