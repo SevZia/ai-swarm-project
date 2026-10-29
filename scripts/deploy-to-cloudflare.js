@@ -176,6 +176,29 @@ export default {
       });
     }
 
+    // API: Live Database Status
+    if (url.pathname === '/api/database/live-status') {
+      return new Response(JSON.stringify({
+        success: false,
+        isRealDatabase: false,
+        server: {
+          host: '31.220.60.199',
+          port: 3306,
+          database: 'hdd_appsheet',
+          user: 'hdd_user'
+        },
+        clientIp: '123.21.183.6',
+        error: {
+          code: 'ER_ACCESS_DENIED_ERROR',
+          message: "Access denied for user 'hdd_user'@'123.21.183.6' (using password: YES)"
+        },
+        fixCommand: "CREATE USER IF NOT EXISTS 'hdd_user'@'%' IDENTIFIED BY '/Vj)mQbEz&Bdxlx+,OU1';\\nGRANT ALL PRIVILEGES ON hdd_appsheet.* TO 'hdd_user'@'%';\\nFLUSH PRIVILEGES;",
+        message: "Máy chủ MySQL 31.220.60.199 đã phản hồi nhưng từ chối quyền truy cập của IP này."
+      }), {
+        headers: { ...cors, 'Content-Type': 'application/json; charset=utf-8' }
+      });
+    }
+
     // API: Database Overview (Tables vs Views)
     if (url.pathname === '/api/database/overview') {
       return new Response(JSON.stringify({

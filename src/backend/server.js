@@ -236,6 +236,35 @@ app.get('/api/price-history', async (req, res) => {
 });
 
 /**
+ * GET /api/database/live-status
+ * Direct live connection test to MySQL 31.220.60.199:3306.
+ * Returns exact error, client IP, or list of real tables and views.
+ */
+app.get('/api/database/live-status', async (req, res) => {
+  try {
+    const result = await db.testLiveConnection();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+app.post('/api/database/test-connection', async (req, res) => {
+  try {
+    const result = await db.testLiveConnection();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+/**
  * GET /api/database/overview
  * Returns metadata, schema definitions, and rows for all Tables and Views in hdd_appsheet.
  */

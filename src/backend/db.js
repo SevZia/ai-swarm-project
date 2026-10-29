@@ -194,9 +194,12 @@ class DatabaseRepository {
     this.priceHistory = JSON.parse(JSON.stringify(initialPriceHistory));
     this.ocrLog = JSON.parse(JSON.stringify(initialOCRLog));
     this.nextHistoryId = 6;
+    this.lastConnectionError = null;
+    this.lastConnectionTime = null;
   }
 
   async init() {
+    this.lastConnectionTime = new Date().toISOString();
     try {
       this.pool = mysql.createPool({
         ...this.mysqlConfig,
@@ -209,9 +212,11 @@ class DatabaseRepository {
       await connection.ping();
       connection.release();
       this.useMySQL = true;
+      this.lastConnectionError = null;
       console.log(`[Database] Connected successfully to MySQL ${this.mysqlConfig.host}:${this.mysqlConfig.port}/${this.mysqlConfig.database}`);
     } catch (err) {
       this.useMySQL = false;
+      this.lastConnectionError = err.message;
       console.warn(`[Database] Remote MySQL (${this.mysqlConfig.host}) unavailable (${err.message}). Using high-fidelity in-memory seed store.`);
     }
   }
@@ -222,7 +227,8 @@ class DatabaseRepository {
         const [rows] = await this.pool.query('SELECT 1 AS alive');
         return {
           connected: true,
-          mode: 'MySQL 8 (hdd_appsheet)',
+          isRealDatabase: true,
+          mode: 'MySQL 8 (hdd_appsheet) - CSDL THẬT',
           host: this.mysqlConfig.host,
           database: this.mysqlConfig.database,
           ping: 'ok'
@@ -230,7 +236,8 @@ class DatabaseRepository {
       } catch (err) {
         return {
           connected: false,
-          mode: 'Memory Fallback (Active)',
+          isRealDatabase: false,
+          mode: 'Dữ Liệu Mẫu (Seed Store) - Lỗi Kết Nối',
           host: this.mysqlConfig.host,
           database: this.mysqlConfig.database,
           error: err.message
@@ -239,11 +246,87 @@ class DatabaseRepository {
     }
     return {
       connected: false,
-      mode: 'In-Memory State Store (UASOF Seed Data)',
+      isRealDatabase: false,
+      mode: 'Dữ Liệu Mẫu Khởi Tạo (Mock Seed Store)',
       host: this.mysqlConfig.host,
       database: this.mysqlConfig.database,
-      note: 'Operating in standalone zero-latency mode'
+      lastError: this.lastConnectionError,
+      note: 'Dữ liệu đang dùng là dữ liệu mẫu khởi tạo do máy chủ MySQL từ chối IP từ xa'
     };
+  }
+
+  async testLiveConnection() {
+    const startTime = Date.now();
+    try {
+      const conn = await mysql.createConnection({
+        host: this.mysqlConfig.host,
+        port: this.mysqlConfig.port,
+        user: this.mysqlConfig.user,
+        password: this.mysqlConfig.password,
+        database: this.mysqlConfig.database,
+        connectTimeout: 4000
+      });
+
+      const [infoRows] = await conn.query('SELECT DATABASE() as db, USER() as user, VERSION() as version');
+      const [tableRows] = await conn.query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'");
+      const [viewRows] = await conn.query("SHOW FULL TABLES WHERE Table_type = 'VIEW'");
+
+      const dbName = this.mysqlConfig.database;
+      const tablesKey = `Tables_in_${dbName}`;
+      const tables = tableRows.map(r => r[tablesKey] || Object.values(r)[0]);
+      const views = viewRows.map(r => r[tablesKey] || Object.values(r)[0]);
+
+      await conn.end();
+
+      this.useMySQL = true;
+      this.lastConnectionError = null;
+
+      return {
+        success: true,
+        isRealDatabase: true,
+        durationMs: Date.now() - startTime,
+        server: {
+          host: this.mysqlConfig.host,
+          port: this.mysqlConfig.port,
+          database: infoRows[0].db,
+          currentUser: infoRows[0].user,
+          version: infoRows[0].version
+        },
+        objects: {
+          tablesCount: tables.length,
+          tablesList: tables,
+          viewsCount: views.length,
+          viewsList: views
+        },
+        message: 'Kết nối thành công 100% đến máy chủ MySQL thực tế trên VPS!'
+      };
+    } catch (err) {
+      this.useMySQL = false;
+      this.lastConnectionError = err.message;
+
+      let clientIp = 'Unknown';
+      const ipMatch = err.message.match(/user '.*?'@'([\d\.]+)'/);
+      if (ipMatch) clientIp = ipMatch[1];
+
+      return {
+        success: false,
+        isRealDatabase: false,
+        durationMs: Date.now() - startTime,
+        server: {
+          host: this.mysqlConfig.host,
+          port: this.mysqlConfig.port,
+          database: this.mysqlConfig.database,
+          user: this.mysqlConfig.user
+        },
+        clientIp: clientIp,
+        error: {
+          code: err.code || 'CONNECTION_ERROR',
+          message: err.message
+        },
+        fixCommand: `CREATE USER IF NOT EXISTS '${this.mysqlConfig.user}'@'%' IDENTIFIED BY '${this.mysqlConfig.password}';\nGRANT ALL PRIVILEGES ON ${this.mysqlConfig.database}.* TO '${this.mysqlConfig.user}'@'%';\nFLUSH PRIVILEGES;`,
+        message: `Máy chủ MySQL ${this.mysqlConfig.host} đã phản hồi nhưng từ chối quyền truy cập của IP ${clientIp}.`
+      };
+    }
   }
 
   calculateSuggestedPrice(costPrice, marginPct) {
