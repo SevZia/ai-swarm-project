@@ -179,6 +179,19 @@ Số lô: BATCH-202610-01 - Hóa đơn VAT: INV-202610-104.`;
     const latestHist = histRes.data.data[0];
     assert(latestHist.SKU === 'TP-BO-TENDER-MB2' && latestHist.UnitPrice === 855000, 'Latest price history entry matches committed quote');
 
+    // TEST 7: GET /api/database/overview (Table vs View)
+    console.log('\n--- 7. Testing GET /api/database/overview ---');
+    const dbOverviewRes = await request({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/database/overview',
+      method: 'GET'
+    });
+    assert(dbOverviewRes.status === 200, 'Database overview endpoint responds with 200 OK');
+    assert(dbOverviewRes.data && dbOverviewRes.data.tables && dbOverviewRes.data.tables.Products, 'Returns Products table metadata');
+    assert(dbOverviewRes.data.tables.Products.rowCount >= 4, 'Products table contains >= 4 records');
+    assert(dbOverviewRes.data.views && dbOverviewRes.data.views.ExpiringProductsWarning, 'Returns ExpiringProductsWarning view metadata');
+
     // SUMMARY
     console.log('\n=======================================================');
     console.log(`🏁 TEST RESULTS: ${passed} PASSED | ${failed} FAILED`);

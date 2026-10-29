@@ -176,6 +176,76 @@ export default {
       });
     }
 
+    // API: Database Overview (Tables vs Views)
+    if (url.pathname === '/api/database/overview') {
+      return new Response(JSON.stringify({
+        success: true,
+        connected: true,
+        database: 'hdd_appsheet',
+        tables: {
+          Products: {
+            name: 'Products',
+            type: 'TABLE',
+            description: 'Danh mục sản phẩm, quy cách cắt, giá vốn và biên lợi nhuận',
+            columns: ['SKU', 'ProductName', 'Category', 'CuttingSpec', 'Unit', 'cost_price', 'previous_cost_price', 'DesiredMarginPct', 'suggested_price', 'latest_supplier', 'last_purchase_date'],
+            primaryKey: 'SKU',
+            rowCount: products.length,
+            data: products.map(p => ({
+              ...p,
+              suggested_price: Math.round(p.cost_price * (1 + (p.DesiredMarginPct || 20) / 100))
+            }))
+          },
+          ProductBatches: {
+            name: 'ProductBatches',
+            type: 'TABLE',
+            description: 'Quản lý từng lô hàng, số lượng tồn kho và hạn sử dụng',
+            columns: ['BatchID', 'BatchNumber', 'SKU', 'StockQuantity', 'ManufactureDate', 'ExpiryDate', 'WarehouseLocation', 'Status'],
+            primaryKey: 'BatchID',
+            rowCount: batches.length,
+            data: batches
+          },
+          PriceHistory: {
+            name: 'PriceHistory',
+            type: 'TABLE',
+            description: 'Nhật ký lịch sử biến động giá nhập',
+            columns: ['HistoryID', 'SKU', 'UnitPrice', 'SupplierName', 'ReceiptRef', 'EffectiveDate', 'SourceType', 'RecordedAt'],
+            primaryKey: 'HistoryID',
+            rowCount: 5,
+            data: [
+              { HistoryID: 1, SKU: 'TP-BO-TENDER-MB2', UnitPrice: 820000, SupplierName: 'Midfield Meat Australia', ReceiptRef: 'INV-202609-088', EffectiveDate: '2026-09-15', SourceType: 'OCR_INVOICE' },
+              { HistoryID: 2, SKU: 'TP-BO-TENDER-MB2', UnitPrice: 850000, SupplierName: 'Midfield Meat Australia', ReceiptRef: 'INV-202610-104', EffectiveDate: '2026-10-20', SourceType: 'OCR_INVOICE' },
+              { HistoryID: 3, SKU: 'TP-BO-STRIP-MB3', UnitPrice: 600000, SupplierName: 'Stanbroke Australia', ReceiptRef: 'INV-202609-112', EffectiveDate: '2026-09-20', SourceType: 'OCR_INVOICE' },
+              { HistoryID: 4, SKU: 'TP-BO-STRIP-MB3', UnitPrice: 620000, SupplierName: 'Stanbroke Australia', ReceiptRef: 'INV-202610-155', EffectiveDate: '2026-10-22', SourceType: 'ZALO_QUOTE' },
+              { HistoryID: 5, SKU: 'TP-BO-BRISKET-CA', UnitPrice: 185000, SupplierName: 'Excel Canada Meat', ReceiptRef: 'INV-CAN-3312', EffectiveDate: '2026-10-25', SourceType: 'MANUAL_EXCEL' }
+            ]
+          },
+          InboundReceiptOCR: {
+            name: 'InboundReceiptOCR',
+            type: 'TABLE',
+            description: 'Nhật ký bóc tách dữ liệu chứng từ AI',
+            columns: ['OCRID', 'ReceiptID', 'SKU', 'ProductName', 'ReceivedQuantity', 'UnitPrice', 'ConfidenceScore', 'Status', 'CreatedAt'],
+            primaryKey: 'OCRID',
+            rowCount: 1,
+            data: [
+              { OCRID: 'OCR-8f12a9e0-d021-4d92-bb50', ReceiptID: 'REC-20261020-01', SKU: 'TP-BO-TENDER-MB2', ProductName: 'Thăn nội bò Úc Chilled MB2+', ReceivedQuantity: 25.5, UnitPrice: 850000, ConfidenceScore: 98.5, Status: 'COMMITTED', CreatedAt: '2026-10-20 09:10:00' }
+            ]
+          }
+        },
+        views: {
+          ExpiringProductsWarning: {
+            name: 'ExpiringProductsWarning',
+            type: 'VIEW',
+            description: 'View cảnh báo các lô hàng cận hạn (DaysRemaining <= 30)',
+            columns: ['SKU', 'ProductName', 'BatchNumber', 'StockQuantity', 'ExpiryDate', 'DaysRemaining', 'WarningAlert'],
+            rowCount: batches.length,
+            data: batches
+          }
+        }
+      }), {
+        headers: { ...cors, 'Content-Type': 'application/json; charset=utf-8' }
+      });
+    }
+
     // API: Extract quote
     if (url.pathname === '/api/extract-quote' && request.method === 'POST') {
       try {

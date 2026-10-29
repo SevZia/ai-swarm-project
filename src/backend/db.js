@@ -520,6 +520,91 @@ class DatabaseRepository {
       totalOcrRecords: this.ocrLog.length
     };
   }
+
+  async getBatches() {
+    if (this.useMySQL) {
+      try {
+        const [rows] = await this.pool.query('SELECT * FROM ProductBatches ORDER BY ExpiryDate ASC');
+        return rows;
+      } catch (err) {
+        console.error('[Database] MySQL ProductBatches query failed:', err.message);
+      }
+    }
+    return [...this.batches];
+  }
+
+  async getOcrLogs() {
+    if (this.useMySQL) {
+      try {
+        const [rows] = await this.pool.query('SELECT * FROM InboundReceiptOCR ORDER BY CreatedAt DESC');
+        return rows;
+      } catch (err) {
+        console.error('[Database] MySQL InboundReceiptOCR query failed:', err.message);
+      }
+    }
+    return [...this.ocrLog];
+  }
+
+  async getAllDatabaseObjects() {
+    const products = await this.getProducts();
+    const batches = await this.getBatches();
+    const priceHistory = await this.getPriceHistory();
+    const ocrLogs = await this.getOcrLogs();
+    const expiringView = await this.getExpiringWarnings();
+    return {
+      connected: this.useMySQL,
+      database: this.mysqlConfig.database,
+      tables: {
+        Products: {
+          name: 'Products',
+          type: 'TABLE',
+          description: 'Danh mục sản phẩm, quy cách cắt, giá vốn và biên lợi nhuận mong muốn',
+          columns: ['SKU', 'ProductName', 'Category', 'CuttingSpec', 'Unit', 'cost_price', 'previous_cost_price', 'DesiredMarginPct', 'suggested_price', 'latest_supplier', 'last_purchase_date', 'updated_at'],
+          primaryKey: 'SKU',
+          rowCount: products.length,
+          data: products
+        },
+        ProductBatches: {
+          name: 'ProductBatches',
+          type: 'TABLE',
+          description: 'Quản lý từng lô hàng, số lượng tồn kho và hạn sử dụng (Expiry Date)',
+          columns: ['BatchID', 'BatchNumber', 'SKU', 'StockQuantity', 'ManufactureDate', 'ExpiryDate', 'WarehouseLocation', 'Status'],
+          primaryKey: 'BatchID',
+          rowCount: batches.length,
+          data: batches
+        },
+        PriceHistory: {
+          name: 'PriceHistory',
+          type: 'TABLE',
+          description: 'Nhật ký lịch sử biến động giá nhập qua từng đợt báo giá/hóa đơn',
+          columns: ['HistoryID', 'SKU', 'UnitPrice', 'SupplierName', 'ReceiptRef', 'EffectiveDate', 'SourceType', 'RecordedAt'],
+          primaryKey: 'HistoryID',
+          rowCount: priceHistory.length,
+          data: priceHistory
+        },
+        InboundReceiptOCR: {
+          name: 'InboundReceiptOCR',
+          type: 'TABLE',
+          description: 'Nhật ký bóc tách dữ liệu hóa đơn/Zalo bằng AI và độ tin cậy',
+          columns: ['OCRID', 'ReceiptID', 'SKU', 'ProductName', 'ReceivedQuantity', 'UnitPrice', 'RawExtractedText', 'ConfidenceScore', 'Status', 'CreatedAt'],
+          primaryKey: 'OCRID',
+          rowCount: ocrLogs.length,
+          data: ocrLogs
+        }
+      },
+      views: {
+        ExpiringProductsWarning: {
+          name: 'ExpiringProductsWarning',
+          type: 'VIEW',
+          description: 'View tự động tính toán thời hạn sử dụng còn lại (DATEDIFF <= 30 ngày) cho Kinh doanh xả hàng',
+          columns: ['SKU', 'ProductName', 'BatchNumber', 'StockQuantity', 'ExpiryDate', 'DaysRemaining', 'WarningAlert'],
+          underlyingTables: ['ProductBatches', 'Products'],
+          rowCount: expiringView.length,
+          data: expiringView
+        }
+      }
+    };
+  }
 }
 
 const db = new DatabaseRepository();

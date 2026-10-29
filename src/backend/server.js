@@ -235,6 +235,65 @@ app.get('/api/price-history', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/database/overview
+ * Returns metadata, schema definitions, and rows for all Tables and Views in hdd_appsheet.
+ */
+app.get('/api/database/overview', async (req, res) => {
+  try {
+    const overview = await db.getAllDatabaseObjects();
+    res.json({
+      success: true,
+      ...overview
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+/**
+ * GET /api/database/batches
+ * Returns ProductBatches table data.
+ */
+app.get('/api/database/batches', async (req, res) => {
+  try {
+    const batches = await db.getBatches();
+    res.json({
+      success: true,
+      count: batches.length,
+      data: batches
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+/**
+ * GET /api/database/ocr-logs
+ * Returns InboundReceiptOCR table data.
+ */
+app.get('/api/database/ocr-logs', async (req, res) => {
+  try {
+    const logs = await db.getOcrLogs();
+    res.json({
+      success: true,
+      count: logs.length,
+      data: logs
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
 // Fallback to index.html for client-side routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
