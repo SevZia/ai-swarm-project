@@ -34,7 +34,7 @@ class QuotaMonitor {
       totalCostUSD: 0.0,
       totalCostVND: 0,
       breakdown: {
-        aiGemini: { requests: 0, tokens: 0, costVND: 0 },
+        aiGemini: { requests: 0, tokens: 0, costVND: 0, provider: 'Google Cloud Vertex AI (Pay-as-you-go)', projectId: 'gen-lang-client-0972886358', model: 'Gemini Flash' },
         cloudflareEdge: { requests: 0, costVND: 0 },
         ocrVision: { requests: 0, costVND: 0 },
         mysqlDb: { queries: 0, costVND: 0 }
@@ -217,6 +217,9 @@ class QuotaMonitor {
     return {
       success: true,
       data: {
+        billingMode: 'Google Cloud Vertex AI (Pay-as-you-go)',
+        gcpProjectId: 'gen-lang-client-0972886358',
+        activeAccount: 'khonghuy84@gmail.com',
         budgetLimitVND: this.state.budgetLimitVND,
         remainingBudgetVND: Math.round(remainingBudgetVND),
         totalCostVND: Math.round(this.state.totalCostVND),
