@@ -217,8 +217,11 @@ class QuotaMonitor {
     return {
       success: true,
       data: {
-        billingMode: 'Google Cloud Vertex AI (Pay-as-you-go)',
-        gcpProjectId: 'gen-lang-client-0972886358',
+        billingMode: 'Google Cloud Enterprise Agent Platform (Vertex AI Pay-as-you-go)',
+        gcpProjectId: process.env.GCP_PROJECT_ID || 'gen-lang-client-0972886358',
+        gcpProjectNumber: process.env.GCP_PROJECT_NUMBER || '762205570591',
+        agentPlatformUrl: 'https://console.cloud.google.com/agent-platform/api-keys?project=' + (process.env.GCP_PROJECT_ID || 'gen-lang-client-0972886358'),
+        apiKeyMasked: 'AQ.Ab8RN6J_...Vsw (Connected)',
         activeAccount: 'khonghuy84@gmail.com',
         budgetLimitVND: this.state.budgetLimitVND,
         remainingBudgetVND: Math.round(remainingBudgetVND),
