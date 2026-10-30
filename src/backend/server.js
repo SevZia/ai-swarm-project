@@ -354,7 +354,7 @@ app.post('/api/quota/simulate', (req, res) => {
   try {
     const { service, action, tokensIn, tokensOut, costVND } = req.body;
     const event = quotaMonitor.recordEvent(
-      service || 'AI Gemini 1.5 Assistant',
+      service || 'AI Gemini 3.8 Flash Assistant',
       action || 'Tư vấn giá margin & truy vấn kho hàng cận hạn',
       tokensIn !== undefined ? Number(tokensIn) : 1500,
       tokensOut !== undefined ? Number(tokensOut) : 450,

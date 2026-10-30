@@ -12,7 +12,7 @@ const DATA_FILE = path.join(__dirname, '../../data_quota.json');
 const USD_TO_VND = 25400;
 
 // Pricing benchmarks:
-// Gemini 1.5 Flash: $0.075 / 1M input tokens, $0.30 / 1M output tokens
+// Gemini 3.8 Flash Medium: $0.075 / 1M input tokens, $0.30 / 1M output tokens
 // Cloudflare Workers: $0.15 / 1M requests (First 100k free/day)
 // OCR Vision: $0.0015 / request
 const RATES = {
@@ -34,7 +34,7 @@ class QuotaMonitor {
       totalCostUSD: 0.0,
       totalCostVND: 0,
       breakdown: {
-        aiGemini: { requests: 0, tokens: 0, costVND: 0, provider: 'Google Cloud Vertex AI (Pay-as-you-go)', projectId: 'gen-lang-client-0972886358', model: 'Gemini Flash' },
+        aiGemini: { requests: 0, tokens: 0, costVND: 0, provider: 'Google Cloud Vertex AI (Pay-as-you-go)', projectId: 'gen-lang-client-0972886358', model: 'Gemini 3.8 Flash Medium' },
         cloudflareEdge: { requests: 0, costVND: 0 },
         ocrVision: { requests: 0, costVND: 0 },
         mysqlDb: { queries: 0, costVND: 0 }
@@ -73,7 +73,7 @@ class QuotaMonitor {
   seedInitialActivity() {
     const initialEvents = [
       {
-        service: 'AI Gemini 1.5 Flash',
+        service: 'AI Gemini 3.8 Flash Medium',
         action: 'Khởi tạo Agent BOSS-AI-LEAD & Phân tích cấu trúc bảng MySQL',
         tokensIn: 1850,
         tokensOut: 620,
