@@ -13,6 +13,7 @@ const multer = require('multer');
 const fs = require('fs');
 const db = require('./db');
 const { parseQuoteText } = require('./parser');
+const quotaMonitor = require('./quota-monitor');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,12 +44,21 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request logging middleware
+// Request logging & Quota tracking middleware
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+    
+    // Auto record non-polling API calls into quota monitor
+    if (req.originalUrl.startsWith('/api/') && !req.originalUrl.includes('/api/quota/overview') && !req.originalUrl.includes('/api/health')) {
+      const isOcr = req.originalUrl.includes('ocr');
+      const isDb = req.originalUrl.includes('database');
+      const serviceName = isOcr ? 'OCR Vision Engine' : (isDb ? 'MySQL VPS Database' : 'API Service Gateway');
+      const actionName = `${req.method} ${req.originalUrl.split('?')[0]} (${res.statusCode})`;
+      quotaMonitor.recordEvent(serviceName, actionName, 120, 60);
+    }
   });
   next();
 });
@@ -320,6 +330,66 @@ app.get('/api/database/ocr-logs', async (req, res) => {
       success: false,
       error: err.message
     });
+  }
+});
+
+/**
+ * GET /api/quota/overview
+ * Real-time usage, cost breakdown, budget thresholds & live activity stream
+ */
+app.get('/api/quota/overview', (req, res) => {
+  try {
+    const data = quotaMonitor.getOverview();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/quota/simulate
+ * Simulates AI Chat, OCR parsing, or AppSheet Sync activity to watch the live ticker update
+ */
+app.post('/api/quota/simulate', (req, res) => {
+  try {
+    const { service, action, tokensIn, tokensOut, costVND } = req.body;
+    const event = quotaMonitor.recordEvent(
+      service || 'AI Gemini 1.5 Assistant',
+      action || 'Tư vấn giá margin & truy vấn kho hàng cận hạn',
+      tokensIn !== undefined ? Number(tokensIn) : 1500,
+      tokensOut !== undefined ? Number(tokensOut) : 450,
+      costVND !== undefined ? Number(costVND) : null
+    );
+    res.json({ success: true, event, overview: quotaMonitor.getOverview() });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/quota/budget
+ * Sets custom budget limit in VND
+ */
+app.post('/api/quota/budget', (req, res) => {
+  try {
+    const { budgetLimitVND } = req.body;
+    quotaMonitor.setBudget(budgetLimitVND);
+    res.json({ success: true, overview: quotaMonitor.getOverview() });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/quota/reset
+ * Resets quota statistics to fresh state
+ */
+app.post('/api/quota/reset', (req, res) => {
+  try {
+    quotaMonitor.resetStats();
+    res.json({ success: true, overview: quotaMonitor.getOverview() });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

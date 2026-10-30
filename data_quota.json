@@ -1,0 +1,206 @@
+{
+  "budgetLimitVND": 500000,
+  "startDate": "2026-10-30",
+  "totalRequests": 16,
+  "totalTokensInput": 7430,
+  "totalTokensOutput": 2170,
+  "totalCostUSD": 0.0023270716535433063,
+  "totalCostVND": 60.3,
+  "breakdown": {
+    "aiGemini": {
+      "requests": 2,
+      "tokens": 3790,
+      "costVND": 13
+    },
+    "cloudflareEdge": {
+      "requests": 1,
+      "costVND": 0.5
+    },
+    "ocrVision": {
+      "requests": 1,
+      "costVND": 45.6
+    },
+    "mysqlDb": {
+      "queries": 12,
+      "costVND": 1.2
+    }
+  },
+  "recentEvents": [
+    {
+      "id": "EVT-1793329655821-37",
+      "timestamp": "10:07:35",
+      "service": "MySQL VPS Database",
+      "action": "GET /api/database/live-status (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329655228-588",
+      "timestamp": "10:07:35",
+      "service": "MySQL VPS Database",
+      "action": "GET /api/database/overview (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329654378-131",
+      "timestamp": "10:07:34",
+      "service": "API Service Gateway",
+      "action": "GET /api/products (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329654376-720",
+      "timestamp": "10:07:34",
+      "service": "API Service Gateway",
+      "action": "GET /api/expiring-warnings (304)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640863-654",
+      "timestamp": "10:07:20",
+      "service": "MySQL VPS Database",
+      "action": "GET /api/database/overview (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640860-717",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "GET /api/price-history (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640858-64",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "GET /api/products (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640856-327",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "POST /api/commit-quote (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640854-690",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "POST /api/extract-quote (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640659-490",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "GET /api/expiring-warnings (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640658-696",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "GET /api/products (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329640655-139",
+      "timestamp": "10:07:20",
+      "service": "API Service Gateway",
+      "action": "GET /api/products (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793329456376-655",
+      "timestamp": "09:54:16",
+      "service": "AI Margin Calculator",
+      "action": "Tự động tính giá bán đề xuất biên độ 25% cho 4 SKU bò Mỹ",
+      "tokens": 1320,
+      "tokensIn": 940,
+      "tokensOut": 380,
+      "costVND": 4.8,
+      "costUSD": 0.000189
+    },
+    {
+      "id": "EVT-1793329456376-707",
+      "timestamp": "09:34:16",
+      "service": "Cloudflare Worker",
+      "action": "Đồng bộ 2 chiều dữ liệu bảng Products với AppSheet Mobile",
+      "tokens": 0,
+      "tokensIn": 0,
+      "tokensOut": 0,
+      "costVND": 0.5,
+      "costUSD": 0.00002
+    },
+    {
+      "id": "EVT-1793329456375-815",
+      "timestamp": "09:04:16",
+      "service": "OCR Vision Engine",
+      "action": "Phân tích bảng báo giá nhà cung cấp MeatWorld HĐ #892",
+      "tokens": 3650,
+      "tokensIn": 3200,
+      "tokensOut": 450,
+      "costVND": 45.6,
+      "costUSD": 0.001795
+    },
+    {
+      "id": "EVT-1793329456374-467",
+      "timestamp": "08:04:16",
+      "service": "AI Gemini 1.5 Flash",
+      "action": "Khởi tạo Agent BOSS-AI-LEAD & Phân tích cấu trúc bảng MySQL",
+      "tokens": 2470,
+      "tokensIn": 1850,
+      "tokensOut": 620,
+      "costVND": 8.2,
+      "costUSD": 0.000323
+    }
+  ]
+}
