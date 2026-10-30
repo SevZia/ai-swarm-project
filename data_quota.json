@@ -1,11 +1,11 @@
 {
   "budgetLimitVND": 200000,
   "startDate": "2026-10-30",
-  "totalRequests": 62,
-  "totalTokensInput": 15360,
-  "totalTokensOutput": 5730,
-  "totalCostUSD": 0.0028038216535433034,
-  "totalCostVND": 76.7,
+  "totalRequests": 66,
+  "totalTokensInput": 15840,
+  "totalTokensOutput": 5970,
+  "totalCostUSD": 0.002804021653543303,
+  "totalCostVND": 77.1,
   "breakdown": {
     "aiGemini": {
       "requests": 4,
@@ -21,11 +21,55 @@
       "costVND": 45.6
     },
     "mysqlDb": {
-      "queries": 56,
-      "costVND": 5.599999999999996
+      "queries": 60,
+      "costVND": 5.999999999999995
     }
   },
   "recentEvents": [
+    {
+      "id": "EVT-1793341373264-769",
+      "timestamp": "13:22:53",
+      "service": "MySQL VPS Database",
+      "action": "GET /api/database/live-status (200)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793341372669-427",
+      "timestamp": "13:22:52",
+      "service": "MySQL VPS Database",
+      "action": "GET /api/database/overview (304)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793341372285-433",
+      "timestamp": "13:22:52",
+      "service": "API Service Gateway",
+      "action": "GET /api/expiring-warnings (304)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
+    {
+      "id": "EVT-1793341372282-603",
+      "timestamp": "13:22:52",
+      "service": "API Service Gateway",
+      "action": "GET /api/products (304)",
+      "tokens": 180,
+      "tokensIn": 120,
+      "tokensOut": 60,
+      "costVND": 0.1,
+      "costUSD": 0
+    },
     {
       "id": "EVT-1793335995737-375",
       "timestamp": "11:53:15",
@@ -531,50 +575,6 @@
       "tokensOut": 400,
       "costVND": 5.3,
       "costUSD": 0.00021
-    },
-    {
-      "id": "EVT-1793329655821-37",
-      "timestamp": "10:07:35",
-      "service": "MySQL VPS Database",
-      "action": "GET /api/database/live-status (200)",
-      "tokens": 180,
-      "tokensIn": 120,
-      "tokensOut": 60,
-      "costVND": 0.1,
-      "costUSD": 0
-    },
-    {
-      "id": "EVT-1793329655228-588",
-      "timestamp": "10:07:35",
-      "service": "MySQL VPS Database",
-      "action": "GET /api/database/overview (200)",
-      "tokens": 180,
-      "tokensIn": 120,
-      "tokensOut": 60,
-      "costVND": 0.1,
-      "costUSD": 0
-    },
-    {
-      "id": "EVT-1793329654378-131",
-      "timestamp": "10:07:34",
-      "service": "API Service Gateway",
-      "action": "GET /api/products (200)",
-      "tokens": 180,
-      "tokensIn": 120,
-      "tokensOut": 60,
-      "costVND": 0.1,
-      "costUSD": 0
-    },
-    {
-      "id": "EVT-1793329654376-720",
-      "timestamp": "10:07:34",
-      "service": "API Service Gateway",
-      "action": "GET /api/expiring-warnings (304)",
-      "tokens": 180,
-      "tokensIn": 120,
-      "tokensOut": 60,
-      "costVND": 0.1,
-      "costUSD": 0
     }
   ]
 }
