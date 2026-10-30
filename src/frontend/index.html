@@ -2820,6 +2820,254 @@ ORDER BY \`DaysRemaining\` ASC;`
       }
     }
 
+    // ================================================================
+    // LIVE COST & QUOTA MONITOR JAVASCRIPT ENGINE
+    // ================================================================
+    async function fetchQuotaData(showNotice = false) {
+      try {
+        const res = await fetch('/api/quota/overview');
+        const json = await res.json();
+        if (json.success && json.data) {
+          renderQuotaDashboard(json.data);
+          if (showNotice) showToast('Đã đồng bộ số liệu Quota & Chi phí mới nhất!', 'info');
+        }
+      } catch (err) {
+        console.warn('Lỗi đọc quota:', err.message);
+      }
+    }
+
+    function renderQuotaDashboard(data) {
+      // Header Tickers
+      const headerCost = document.getElementById('header-cost-ticker');
+      if (headerCost) headerCost.innerText = data.totalCostVND.toLocaleString('vi-VN') + ' đ';
+
+      const headerPercent = document.getElementById('header-quota-percent');
+      if (headerPercent) headerPercent.innerText = data.percentUsed + '% Quota';
+
+      const navCostText = document.getElementById('nav-cost-text');
+      if (navCostText) {
+        navCostText.innerText = data.totalCostVND.toLocaleString('vi-VN') + 'đ / ' + (Math.round(data.budgetLimitVND / 1000)) + 'k';
+      }
+
+      // KPI Cards
+      const kpiCostVnd = document.getElementById('quota-kpi-cost-vnd');
+      if (kpiCostVnd) kpiCostVnd.innerText = data.totalCostVND.toLocaleString('vi-VN') + ' đ';
+
+      const kpiCostUsd = document.getElementById('quota-kpi-cost-usd');
+      if (kpiCostUsd) kpiCostUsd.innerText = '$' + data.totalCostUSD.toFixed(4);
+
+      const kpiRemaining = document.getElementById('quota-kpi-remaining-vnd');
+      if (kpiRemaining) kpiRemaining.innerText = data.remainingBudgetVND.toLocaleString('vi-VN') + ' đ';
+
+      const kpiBudgetLimit = document.getElementById('quota-kpi-budget-limit');
+      if (kpiBudgetLimit) kpiBudgetLimit.innerText = data.budgetLimitVND.toLocaleString('vi-VN') + ' đ';
+
+      const kpiTokens = document.getElementById('quota-kpi-tokens');
+      if (kpiTokens) kpiTokens.innerText = data.totalTokens.toLocaleString('vi-VN');
+
+      const kpiRequests = document.getElementById('quota-kpi-requests');
+      if (kpiRequests) kpiRequests.innerText = data.totalRequests.toLocaleString('vi-VN') + ' calls';
+
+      const kpiHealthStatus = document.getElementById('quota-kpi-health-status');
+      if (kpiHealthStatus) {
+        kpiHealthStatus.innerText = data.healthStatus;
+        kpiHealthStatus.className = 'text-xl sm:text-2xl font-black uppercase text-' + (data.healthClass === 'rose' ? 'rose-600 dark:text-rose-400' : (data.healthClass === 'amber' ? 'amber-600 dark:text-amber-400' : 'emerald-600 dark:text-emerald-400'));
+      }
+
+      const kpiPercentUsed = document.getElementById('quota-kpi-percent-used');
+      if (kpiPercentUsed) kpiPercentUsed.innerText = data.percentUsed + '%';
+
+      // Progress Bar
+      const progressBar = document.getElementById('quota-progress-bar');
+      if (progressBar) {
+        const pct = Math.max(1, Math.min(100, data.percentUsed));
+        progressBar.style.width = pct + '%';
+        if (data.percentUsed >= 90) {
+          progressBar.className = 'h-full rounded-full bg-gradient-to-r from-rose-500 to-red-600 transition-all duration-500';
+        } else if (data.percentUsed >= 70) {
+          progressBar.className = 'h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 transition-all duration-500';
+        } else {
+          progressBar.className = 'h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500';
+        }
+      }
+
+      const progressLabel = document.getElementById('quota-progress-label');
+      if (progressLabel) {
+        progressLabel.innerText = data.percentUsed + '% (Đã chi ' + data.totalCostVND.toLocaleString('vi-VN') + 'đ / ' + data.budgetLimitVND.toLocaleString('vi-VN') + 'đ)';
+      }
+
+      const progressMaxLabel = document.getElementById('quota-progress-max-label');
+      if (progressMaxLabel) progressMaxLabel.innerText = '100% (' + data.budgetLimitVND.toLocaleString('vi-VN') + 'đ)';
+
+      // Service Breakdown Table
+      const bd = data.breakdown;
+      if (bd) {
+        const aiVol = document.getElementById('breakdown-ai-volume');
+        const aiCost = document.getElementById('breakdown-ai-cost');
+        if (aiVol) aiVol.innerText = (bd.aiGemini.tokens || 0).toLocaleString('vi-VN') + ' tokens (' + (bd.aiGemini.requests || 0) + ' calls)';
+        if (aiCost) aiCost.innerText = Math.round(bd.aiGemini.costVND || 0).toLocaleString('vi-VN') + ' đ';
+
+        const ocrVol = document.getElementById('breakdown-ocr-volume');
+        const ocrCost = document.getElementById('breakdown-ocr-cost');
+        if (ocrVol) ocrVol.innerText = (bd.ocrVision.requests || 0) + ' lần quét';
+        if (ocrCost) ocrCost.innerText = Math.round(bd.ocrVision.costVND || 0).toLocaleString('vi-VN') + ' đ';
+
+        const cfVol = document.getElementById('breakdown-cf-volume');
+        const cfCost = document.getElementById('breakdown-cf-cost');
+        if (cfVol) cfVol.innerText = (bd.cloudflareEdge.requests || 0) + ' reqs';
+        if (cfCost) cfCost.innerText = Math.round(bd.cloudflareEdge.costVND || 0).toLocaleString('vi-VN') + ' đ';
+
+        const dbVol = document.getElementById('breakdown-db-volume');
+        const dbCost = document.getElementById('breakdown-db-cost');
+        if (dbVol) dbVol.innerText = (bd.mysqlDb.queries || 0) + ' queries';
+        if (dbCost) dbCost.innerText = Math.round(bd.mysqlDb.costVND || 0).toLocaleString('vi-VN') + ' đ';
+      }
+
+      // Live Events Stream
+      const tbody = document.getElementById('quota-events-tbody');
+      if (tbody && data.recentEvents) {
+        let rowsHtml = '';
+        data.recentEvents.slice(0, 15).forEach(evt => {
+          let dotColor = 'bg-emerald-500';
+          let textColor = 'text-emerald-600 dark:text-emerald-400';
+          if (evt.service.includes('AI') || evt.service.includes('Gemini')) {
+            dotColor = 'bg-purple-500';
+            textColor = 'text-purple-600 dark:text-purple-400';
+          } else if (evt.service.includes('OCR')) {
+            dotColor = 'bg-blue-500';
+            textColor = 'text-blue-600 dark:text-blue-400';
+          } else if (evt.service.includes('Cloudflare')) {
+            dotColor = 'bg-amber-500';
+            textColor = 'text-amber-600 dark:text-amber-400';
+          }
+
+          rowsHtml += `
+            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+              <td class="py-2.5 px-3.5 font-mono text-slate-500 text-[11px]">${evt.timestamp}</td>
+              <td class="py-2.5 px-3 font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full ${dotColor}"></span>
+                <span>${evt.service}</span>
+              </td>
+              <td class="py-2.5 px-3.5 text-slate-700 dark:text-slate-300 text-xs">${evt.action}</td>
+              <td class="py-2.5 px-3 text-center font-mono text-[11px] text-slate-500">${evt.tokens ? evt.tokens.toLocaleString('vi-VN') + ' tks' : '1 req'}</td>
+              <td class="py-2.5 px-3.5 text-right font-mono font-black ${textColor} text-xs">+${evt.costVND} đ</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = rowsHtml;
+      }
+
+      const syncTime = document.getElementById('quota-last-sync-time');
+      if (syncTime) syncTime.innerText = 'Cập nhật lúc: ' + new Date().toLocaleTimeString('vi-VN');
+    }
+
+    async function simulateActivity(type) {
+      let payload = {};
+      if (type === 'ai') {
+        payload = {
+          service: 'AI Gemini 1.5 Flash',
+          action: 'Trợ lý AI phân tích margin & so sánh giá đối thủ cho 5 SKU',
+          tokensIn: 1450,
+          tokensOut: 520
+        };
+      } else if (type === 'ocr') {
+        payload = {
+          service: 'OCR Vision Engine',
+          action: 'Bóc tách ảnh chụp bảng báo giá Zalo NPP Nam Khải Phú',
+          tokensIn: 3800,
+          tokensOut: 610
+        };
+      } else if (type === 'sync') {
+        payload = {
+          service: 'Cloudflare Worker',
+          action: 'Đồng bộ hóa tức thời 120 dòng bảng Products & Batches với AppSheet',
+          tokensIn: 0,
+          tokensOut: 0,
+          costVND: 1.2
+        };
+      }
+
+      try {
+        const res = await fetch('/api/quota/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success && json.overview) {
+          renderQuotaDashboard(json.overview.data);
+          showToast(`Đã ghi nhận tác vụ: ${payload.action} (+${json.event.costVND}đ)`, 'success');
+        }
+      } catch (err) {
+        showToast('Lỗi mô phỏng: ' + err.message, 'error');
+      }
+    }
+
+    function openBudgetModal() {
+      const modal = document.getElementById('budget-modal');
+      const input = document.getElementById('input-budget-vnd');
+      if (modal && input) {
+        modal.classList.remove('hidden');
+        input.focus();
+      }
+    }
+
+    function closeBudgetModal() {
+      const modal = document.getElementById('budget-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function setBudgetPreset(amount) {
+      const input = document.getElementById('input-budget-vnd');
+      if (input) input.value = amount;
+    }
+
+    async function saveBudgetLimit() {
+      const input = document.getElementById('input-budget-vnd');
+      const limit = input ? parseFloat(input.value) : 0;
+      if (!limit || limit < 10000) {
+        showToast('Vui lòng nhập hạn mức tối thiểu 10,000 VNĐ!', 'error');
+        return;
+      }
+      try {
+        const res = await fetch('/api/quota/budget', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ budgetLimitVND: limit })
+        });
+        const json = await res.json();
+        if (json.success && json.overview) {
+          renderQuotaDashboard(json.overview.data);
+          closeBudgetModal();
+          showToast('Đã cập nhật hạn mức ngân sách thành ' + limit.toLocaleString('vi-VN') + ' VNĐ!', 'success');
+        }
+      } catch (err) {
+        showToast('Lỗi cập nhật hạn mức: ' + err.message, 'error');
+      }
+    }
+
+    async function resetQuotaCounters() {
+      if (!confirm('Bạn có chắc muốn đặt lại toàn bộ bộ đếm chi phí & lượt dùng về 0 để test lại từ đầu không?')) return;
+      try {
+        const res = await fetch('/api/quota/reset', { method: 'POST' });
+        const json = await res.json();
+        if (json.success && json.overview) {
+          renderQuotaDashboard(json.overview.data);
+          showToast('Đã đặt lại toàn bộ thống kê quota về 0!', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi đặt lại: ' + err.message, 'error');
+      }
+    }
+
+    // Auto start polling every 2.5s for live cost streaming
+    setInterval(() => {
+      fetchQuotaData();
+    }, 2500);
+
+    // Initial fetch on DOM load
+    setTimeout(fetchQuotaData, 500);
+
   </script>
 
 
